@@ -228,7 +228,10 @@ class DeltaRobotSimulator:
         hw = max(float(np.max(np.abs(pts[:, :2]))) + 20, 110)
         self.ax3.set_xlim(-hw, hw)
         self.ax3.set_ylim(-hw, hw)
-        self.ax3.set_zlim(float(np.min(pts[:, 2])) - 20, float(np.max(pts[:, 2])) + 30)
+        # Swap min/max so Z axis is inverted: base (Z=0) at bottom, EE (Z negative) above
+        z_lo = float(np.min(pts[:, 2])) - 20
+        z_hi = float(np.max(pts[:, 2])) + 30
+        self.ax3.set_zlim(z_hi, z_lo)
 
         # ---- 2-D XY panel --------------------------------------------
         self._ee2d.set_data([self.ee[0]], [self.ee[1]])

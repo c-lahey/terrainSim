@@ -24,6 +24,23 @@ Coordinate system:
 """
 
 import math
+import numpy as np
+
+
+# Outward radial unit vectors from base centre to each servo output (XY plane).
+# Leg 1 points along −Y; legs 2 and 3 are rotated ±120°.
+LEG_DIRS = np.array([
+    [ 0.0,              -1.0,             0.0],   # leg 1
+    [ math.sqrt(3)/2,    0.5,             0.0],   # leg 2 (+120°)
+    [-math.sqrt(3)/2,    0.5,             0.0],   # leg 3 (−120°)
+])
+
+# Tangent unit vectors perpendicular to LEG_DIRS in the XY plane (CCW 90°).
+LEG_TANGS = np.array([
+    [-d[1], d[0], 0.0] for d in LEG_DIRS
+])
+
+_DOWN = np.array([0.0, 0.0, -1.0])
 
 
 class DeltaPositionError(Exception):
@@ -191,6 +208,129 @@ class DeltaRobot:
         )  # rotate frame −120°
 
         return (theta1, theta2, theta3)
+
+    # ------------------------------------------------------------------
+    # Differential kinematics and statics
+    # ------------------------------------------------------------------
+
+    def geometry(
+        self, x: float, y: float, z: float
+    ) -> dict:
+        """
+        Compute all 3-D positions needed to render the robot configuration.
+
+        Returns a dict with keys:
+            thetas    : (3,) array of servo angles in degrees
+            servos    : (3, 3) array — servo output positions (fixed)
+            elbows    : (3, 3) array — actual elbow positions (end of active arm)
+            anchors   : (3, 3) array — EE platform anchor points
+            ee_center : (3,)  array — end-effector centre
+
+        Raises DeltaPositionError if (x, y, z) is unreachable.
+
+        Geometry derivation
+        -------------------
+        The servo output for leg i is at  S_i = f · d_i  (d_i from LEG_DIRS).
+        The active arm rotates in the plane spanned by d_i and the z-axis:
+
+            E_i = S_i + rf · (d_i · cos θᵢ + ẑ_down · sin θᵢ)
+
+        where ẑ_down = (0, 0, −1) so that positive θ tilts the arm downward.
+        The EE anchor for leg i sits at distance e from the EE centre along d_i:
+
+            A_i = ee_centre + e · d_i
+        """
+        thetas = np.array(self.inverse(x, y, z))
+        ee = np.array([x, y, z])
+
+        servos  = LEG_DIRS * self.rf  # Note: actually f * d_i
+        servos  = LEG_DIRS * self.f
+
+        elbows = np.empty((3, 3))
+        for i in range(3):
+            th = math.radians(thetas[i])
+            arm = LEG_DIRS[i] * math.cos(th) + _DOWN * math.sin(th)
+            elbows[i] = servos[i] + self.rf * arm
+
+        anchors = ee[None, :] + self.e * LEG_DIRS  # (3, 3)
+
+        return {
+            "thetas":    thetas,
+            "servos":    servos,
+            "elbows":    elbows,
+            "anchors":   anchors,
+            "ee_center": ee,
+        }
+
+    def static_torques(
+        self,
+        x: float,
+        y: float,
+        z: float,
+        force: np.ndarray,
+    ) -> np.ndarray:
+        """
+        Compute joint torques required for static equilibrium under an external
+        force applied at the end-effector.
+
+        Parameters
+        ----------
+        x, y, z : float
+            Current end-effector position.
+        force : array-like, shape (3,)
+            Force vector [Fx, Fy, Fz] applied at the EE centre (Newtons if
+            lengths are in mm; torques will then be in N·mm).
+
+        Returns
+        -------
+        torques : ndarray, shape (3,)
+            Joint torques [τ₁, τ₂, τ₃].
+
+        Raises
+        ------
+        DeltaPositionError
+            If the position is unreachable.
+        numpy.linalg.LinAlgError
+            If the configuration is singular (robot at a singularity).
+
+        Derivation
+        ----------
+        Differentiating the passive-link length constraint for leg i:
+
+            |Eᵢ − Aᵢ|² = re²
+
+        gives:
+
+            nᵢ · (Ėᵢ − ẋ_ee) = 0   where  nᵢ = Eᵢ − Aᵢ
+
+        Letting bᵢ = nᵢ · (∂Eᵢ/∂θᵢ):
+
+            bᵢ δθᵢ = nᵢ · δx_ee   … (constraint)
+
+        Applying virtual work  Σ τᵢ δθᵢ = F · δx_ee  and substituting the
+        constraint to eliminate δθᵢ:
+
+            [n₁ | n₂ | n₃] · diag(τ/b) = F
+            ⟹  τᵢ = bᵢ · (N⁻ᵀ F)ᵢ     where N has rows nᵢ
+        """
+        geo = self.geometry(x, y, z)
+        thetas  = geo["thetas"]
+        elbows  = geo["elbows"]
+        anchors = geo["anchors"]
+        F = np.asarray(force, dtype=float)
+
+        n_vecs = np.empty((3, 3))
+        b_vals = np.empty(3)
+        for i in range(3):
+            th = math.radians(thetas[i])
+            n_i = elbows[i] - anchors[i]
+            dE_i = self.rf * (-LEG_DIRS[i] * math.sin(th) + _DOWN * math.cos(th))
+            n_vecs[i] = n_i
+            b_vals[i] = float(np.dot(n_i, dE_i))
+
+        # Solve  N.T @ y = F  then  τ = b ⊙ y
+        y = np.linalg.solve(n_vecs.T, F)
+        return b_vals * y
 
     # ------------------------------------------------------------------
     # Workspace sampling

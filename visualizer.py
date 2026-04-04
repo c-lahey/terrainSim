@@ -91,6 +91,10 @@ class DeltaRobotSimulator:
         self.ax3.set_xlabel("X (mm)", labelpad=2)
         self.ax3.set_ylabel("Y (mm)", labelpad=2)
         self.ax3.set_zlabel("Z (mm)", labelpad=2)
+        # Fixed axes — set once here, never touched in _refresh
+        self.ax3.set_xlim(-200, 200)
+        self.ax3.set_ylim(-200, 200)
+        self.ax3.set_zlim(50, -280)   # inverted: base (0) at bottom, EE above
 
         # 2-D XY drag panel (top-right)
         self.ax2 = self.fig.add_axes([0.60, 0.56, 0.36, 0.36])
@@ -223,15 +227,6 @@ class DeltaRobotSimulator:
                 color=_C_FORCE, lw=2, arrow_length_ratio=0.25,
             )
 
-        # Auto-scale 3-D axes
-        pts = np.vstack([servos, elbows, anchors, self.ee[None, :]])
-        hw = max(float(np.max(np.abs(pts[:, :2]))) + 20, 110)
-        self.ax3.set_xlim(-hw, hw)
-        self.ax3.set_ylim(-hw, hw)
-        # Swap min/max so Z axis is inverted: base (Z=0) at bottom, EE (Z negative) above
-        z_lo = float(np.min(pts[:, 2])) - 20
-        z_hi = float(np.max(pts[:, 2])) + 30
-        self.ax3.set_zlim(z_hi, z_lo)
 
         # ---- 2-D XY panel --------------------------------------------
         self._ee2d.set_data([self.ee[0]], [self.ee[1]])

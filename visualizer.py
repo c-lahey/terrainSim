@@ -6,7 +6,8 @@ Layout
   Left  : 3-D robot configuration — base triangle, active arms,
            parallel-link parallelograms, EE platform, force arrow.
   Right  : top-down XY drag panel (click and drag the EE),
-           Z-height slider, force-vector sliders (Fx Fy Fz),
+           robot geometry sliders (rf, re, f, e),
+           pose + force sliders (Z, Fx, Fy, Fz),
            live readout of joint angles and equilibrium torques.
 
 Interaction
@@ -82,11 +83,11 @@ class DeltaRobotSimulator:
     # ------------------------------------------------------------------
 
     def _build_figure(self) -> None:
-        self.fig = plt.figure(figsize=(15, 8))
+        self.fig = plt.figure(figsize=(16, 10))
         self.fig.suptitle("Delta Robot Kinematics Simulator", fontsize=13, y=0.99)
 
         # 3-D robot view (left ~57 %)
-        self.ax3 = self.fig.add_axes([0.01, 0.06, 0.56, 0.90], projection="3d")
+        self.ax3 = self.fig.add_axes([0.01, 0.05, 0.56, 0.92], projection="3d")
         self.ax3.set_title("Robot Configuration", fontsize=10, pad=6)
         self.ax3.set_xlabel("X (mm)", labelpad=2)
         self.ax3.set_ylabel("Y (mm)", labelpad=2)
@@ -97,7 +98,7 @@ class DeltaRobotSimulator:
         self.ax3.set_zlim(50, -280)   # inverted: base (0) at bottom, EE above
 
         # 2-D XY drag panel (top-right)
-        self.ax2 = self.fig.add_axes([0.60, 0.56, 0.36, 0.36])
+        self.ax2 = self.fig.add_axes([0.60, 0.67, 0.36, 0.28])
         self.ax2.set_title("XY Control — click & drag to move EE", fontsize=9)
         self.ax2.set_xlim(-65, 65)
         self.ax2.set_ylim(-65, 65)
@@ -106,20 +107,38 @@ class DeltaRobotSimulator:
         self.ax2.set_ylabel("Y (mm)", fontsize=8)
         self.ax2.grid(True, alpha=0.25)
 
-        # Sliders — laid out below the 2-D panel
-        def _mkslider(y: float, label: str, lo: float, hi: float, v0: float) -> Slider:
-            ax = self.fig.add_axes([0.64, y, 0.28, 0.026])
-            return Slider(ax, label, lo, hi, valinit=v0, color="#607d8b")
+        # ------------------------------------------------------------------
+        # Sliders: two groups separated by a label
+        # ------------------------------------------------------------------
+        def _mkslider(y: float, label: str, lo: float, hi: float, v0: float,
+                      color: str = "#607d8b") -> Slider:
+            ax = self.fig.add_axes([0.64, y, 0.28, 0.022])
+            return Slider(ax, label, lo, hi, valinit=v0, color=color)
 
-        self.sl_z  = _mkslider(0.455, "Z (mm)",  -260, -80, float(self.ee[2]))
-        self.sl_fx = _mkslider(0.365, "Fx (N)",   -30,  30, 0.0)
-        self.sl_fy = _mkslider(0.295, "Fy (N)",   -30,  30, 0.0)
-        self.sl_fz = _mkslider(0.225, "Fz (N)",   -30,  30, 0.0)
+        # Section headers (figure-level text)
+        self.fig.text(0.605, 0.645, "Robot Geometry", fontsize=8,
+                      fontweight="bold", color="#444444")
+        self.fig.text(0.605, 0.455, "Pose & Applied Force", fontsize=8,
+                      fontweight="bold", color="#444444")
+
+        r = self.robot
+        self.sl_rf = _mkslider(0.610, "rf — active arm (mm)",  20, 200, r.rf, "#5c6bc0")
+        self.sl_re = _mkslider(0.568, "re — passive link (mm)", 50, 400, r.re, "#5c6bc0")
+        self.sl_f  = _mkslider(0.526, "f  — base radius (mm)",  10, 200, r.f,  "#5c6bc0")
+        self.sl_e  = _mkslider(0.484, "e  — EE radius (mm)",     5,  80, r.e,  "#5c6bc0")
+
+        self.sl_z  = _mkslider(0.420, "Z (mm)",  -350, -50, float(self.ee[2]))
+        self.sl_fx = _mkslider(0.375, "Fx (N)",   -30,  30, 0.0)
+        self.sl_fy = _mkslider(0.330, "Fy (N)",   -30,  30, 0.0)
+        self.sl_fz = _mkslider(0.285, "Fz (N)",   -30,  30, 0.0)
+
+        for sl in (self.sl_rf, self.sl_re, self.sl_f, self.sl_e):
+            sl.on_changed(self._on_geometry_slider)
         for sl in (self.sl_z, self.sl_fx, self.sl_fy, self.sl_fz):
             sl.on_changed(self._on_slider)
 
         # Info text panel (bottom-right)
-        self.ax_info = self.fig.add_axes([0.59, 0.01, 0.40, 0.19])
+        self.ax_info = self.fig.add_axes([0.59, 0.01, 0.40, 0.25])
         self.ax_info.axis("off")
         self._info_txt = self.ax_info.text(
             0.0, 1.0, "",
@@ -260,6 +279,30 @@ class DeltaRobotSimulator:
     # ------------------------------------------------------------------
     # Event handlers
     # ------------------------------------------------------------------
+
+    def _on_geometry_slider(self, _val) -> None:
+        """Rebuild the robot with new geometric parameters, then re-validate EE."""
+        self.robot = DeltaRobot(
+            servo_link_length=self.sl_rf.val,
+            parallel_link_length=self.sl_re.val,
+            servo_displacement=self.sl_f.val,
+            effector_displacement=self.sl_e.val,
+        )
+        # If the current EE is no longer reachable, snap to the neutral pose
+        try:
+            self.robot.inverse(*self.ee)
+        except DeltaPositionError:
+            fallback = self.robot.forward(20.0, 20.0, 20.0)
+            if fallback is None:
+                fallback = self.robot.forward(10.0, 10.0, 10.0)
+            if fallback is not None:
+                self.ee[:] = fallback
+                self._last_valid[:] = fallback
+                # Sync Z slider without re-triggering its callback
+                self.sl_z.eventson = False
+                self.sl_z.set_val(float(self.ee[2]))
+                self.sl_z.eventson = True
+        self._refresh()
 
     def _on_slider(self, _val) -> None:
         self.ee[2] = self.sl_z.val

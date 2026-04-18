@@ -6,16 +6,9 @@ Layout
   Left  : 3-D robot configuration — base triangle, active arms,
            parallel-link parallelograms, EE platform, force arrow.
   Right  : top-down XY drag panel (click and drag the EE),
-           robot geometry sliders (rf, re, f, e),
+           robot geometry sliders (rf, re, f, e, apex angle),
            pose + force sliders (Z, Fx, Fy, Fz),
            live readout of joint angles and equilibrium torques.
-
-Interaction
------------
-  • Click anywhere in the "XY Control" panel and drag to move the EE
-    in the horizontal plane.
-  • Use the Z slider to change EE height.
-  • Use the Fx / Fy / Fz sliders to set the applied force vector.
 
 Run
 ---
@@ -26,9 +19,9 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 — registers 3-D projection
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 
-from kinematics import DeltaRobot, DeltaPositionError, LEG_DIRS, LEG_TANGS
+from kinematics import DeltaRobot, DeltaPositionError
 
 # ---------------------------------------------------------------------------
 # Default robot (matches mhp/delta-bot example, units: mm)
@@ -38,24 +31,20 @@ DEFAULT_ROBOT = DeltaRobot(
     parallel_link_length=210.0,
     servo_displacement=72.0,
     effector_displacement=20.0,
+    apex_angle=60.0,
 )
 
-# Visual half-width of each passive-link parallelogram (mm)
-_PLINK_W = 5.0
+_PLINK_W = 5.0   # visual half-width of passive-link parallelogram (mm)
+_DOWN    = np.array([0.0, 0.0, -1.0])
 
-# Colours
 _C_BASE  = "#888888"
-_C_ARM   = "#2979ff"   # active arms  — blue
-_C_LINK  = "#ff9100"   # passive links — amber
-_C_EE    = "#00e676"   # EE platform  — green
-_C_EE_PT = "#ff1744"   # EE centre dot — red
-_C_FORCE = "#ff1744"   # force arrow
-
-_DOWN = np.array([0.0, 0.0, -1.0])
+_C_ARM   = "#2979ff"
+_C_LINK  = "#ff9100"
+_C_EE    = "#00e676"
+_C_EE_PT = "#ff1744"
+_C_FORCE = "#ff1744"
 
 
-# ---------------------------------------------------------------------------
-# Simulator class
 # ---------------------------------------------------------------------------
 
 class DeltaRobotSimulator:
@@ -64,7 +53,6 @@ class DeltaRobotSimulator:
     def __init__(self, robot: DeltaRobot = DEFAULT_ROBOT):
         self.robot = robot
 
-        # State
         pos = robot.forward(20.0, 20.0, 20.0)
         self.ee = np.array(pos, dtype=float)
         self._last_valid = self.ee.copy()
@@ -92,10 +80,9 @@ class DeltaRobotSimulator:
         self.ax3.set_xlabel("X (mm)", labelpad=2)
         self.ax3.set_ylabel("Y (mm)", labelpad=2)
         self.ax3.set_zlabel("Z (mm)", labelpad=2)
-        # Fixed axes — set once here, never touched in _refresh
         self.ax3.set_xlim(-200, 200)
         self.ax3.set_ylim(-200, 200)
-        self.ax3.set_zlim(50, -280)   # inverted: base (0) at bottom, EE above
+        self.ax3.set_zlim(50, -280)   # inverted: base at visual bottom
 
         # 2-D XY drag panel (top-right)
         self.ax2 = self.fig.add_axes([0.60, 0.67, 0.36, 0.28])
@@ -108,37 +95,37 @@ class DeltaRobotSimulator:
         self.ax2.grid(True, alpha=0.25)
 
         # ------------------------------------------------------------------
-        # Sliders: two groups separated by a label
+        # Sliders
         # ------------------------------------------------------------------
         def _mkslider(y: float, label: str, lo: float, hi: float, v0: float,
                       color: str = "#607d8b") -> Slider:
             ax = self.fig.add_axes([0.64, y, 0.28, 0.022])
             return Slider(ax, label, lo, hi, valinit=v0, color=color)
 
-        # Section headers (figure-level text)
-        self.fig.text(0.605, 0.645, "Robot Geometry", fontsize=8,
+        self.fig.text(0.605, 0.650, "Robot Geometry", fontsize=8,
                       fontweight="bold", color="#444444")
-        self.fig.text(0.605, 0.455, "Pose & Applied Force", fontsize=8,
+        self.fig.text(0.605, 0.430, "Pose & Applied Force", fontsize=8,
                       fontweight="bold", color="#444444")
 
         r = self.robot
-        self.sl_rf = _mkslider(0.610, "rf — active arm (mm)",  20, 200, r.rf, "#5c6bc0")
-        self.sl_re = _mkslider(0.568, "re — passive link (mm)", 50, 400, r.re, "#5c6bc0")
-        self.sl_f  = _mkslider(0.526, "f  — base radius (mm)",  10, 200, r.f,  "#5c6bc0")
-        self.sl_e  = _mkslider(0.484, "e  — EE radius (mm)",     5,  80, r.e,  "#5c6bc0")
+        self.sl_rf   = _mkslider(0.617, "rf — active arm (mm)",   20, 200, r.rf,         "#5c6bc0")
+        self.sl_re   = _mkslider(0.577, "re — passive link (mm)",  50, 400, r.re,         "#5c6bc0")
+        self.sl_f    = _mkslider(0.537, "f  — base radius (mm)",   10, 200, r.f,          "#5c6bc0")
+        self.sl_e    = _mkslider(0.497, "e  — EE radius (mm)",      5,  80, r.e,          "#5c6bc0")
+        self.sl_apex = _mkslider(0.457, "apex angle (°)",          20, 160, r.apex_angle, "#5c6bc0")
 
-        self.sl_z  = _mkslider(0.420, "Z (mm)",  -350, -50, float(self.ee[2]))
-        self.sl_fx = _mkslider(0.375, "Fx (N)",   -30,  30, 0.0)
-        self.sl_fy = _mkslider(0.330, "Fy (N)",   -30,  30, 0.0)
-        self.sl_fz = _mkslider(0.285, "Fz (N)",   -30,  30, 0.0)
+        self.sl_z  = _mkslider(0.395, "Z (mm)",  -350, -50, float(self.ee[2]))
+        self.sl_fx = _mkslider(0.353, "Fx (N)",   -30,  30, 0.0)
+        self.sl_fy = _mkslider(0.311, "Fy (N)",   -30,  30, 0.0)
+        self.sl_fz = _mkslider(0.269, "Fz (N)",   -30,  30, 0.0)
 
-        for sl in (self.sl_rf, self.sl_re, self.sl_f, self.sl_e):
+        for sl in (self.sl_rf, self.sl_re, self.sl_f, self.sl_e, self.sl_apex):
             sl.on_changed(self._on_geometry_slider)
         for sl in (self.sl_z, self.sl_fx, self.sl_fy, self.sl_fz):
             sl.on_changed(self._on_slider)
 
-        # Info text panel (bottom-right)
-        self.ax_info = self.fig.add_axes([0.59, 0.01, 0.40, 0.25])
+        # Info text panel
+        self.ax_info = self.fig.add_axes([0.59, 0.01, 0.40, 0.24])
         self.ax_info.axis("off")
         self._info_txt = self.ax_info.text(
             0.0, 1.0, "",
@@ -155,38 +142,25 @@ class DeltaRobotSimulator:
         kw2 = dict(lw=2)
         kw3 = dict(lw=3)
 
-        # Base triangle: 3 edges
-        self._base = [a.plot([], [], [], color=_C_BASE, **kw2)[0] for _ in range(3)]
-
-        # Active arms: 1 line per leg
-        self._arms = [a.plot([], [], [], color=_C_ARM, **kw3)[0] for _ in range(3)]
-
-        # Passive links: 2 rods per leg (parallelogram), 6 lines total
-        self._links = [a.plot([], [], [], color=_C_LINK, **kw2)[0] for _ in range(6)]
-
-        # EE platform: 3 edges + centre point
+        self._base  = [a.plot([], [], [], color=_C_BASE,  **kw2)[0] for _ in range(3)]
+        self._arms  = [a.plot([], [], [], color=_C_ARM,   **kw3)[0] for _ in range(3)]
+        self._links = [a.plot([], [], [], color=_C_LINK,  **kw2)[0] for _ in range(6)]
         self._ee_edges = [a.plot([], [], [], color=_C_EE, **kw2)[0] for _ in range(3)]
         self._ee_pt,   = a.plot([], [], [], "o", color=_C_EE_PT, ms=9, zorder=6)
+        self._quiver   = None
 
-        # Force arrow — placeholder, created/removed in _refresh
-        self._quiver = None
-
-        # 2-D panel: workspace circle, crosshairs, EE dot, drag trail
         self.ax2.add_patch(
             plt.Circle((0, 0), 50, fill=False, ls="--", lw=1, color="gray", alpha=0.45)
         )
         self.ax2.axhline(0, color="gray", lw=0.5, alpha=0.3)
         self.ax2.axvline(0, color="gray", lw=0.5, alpha=0.3)
-        self._ee2d,   = self.ax2.plot([], [], "o", color=_C_EE_PT, ms=11, zorder=5)
+        self._ee2d,    = self.ax2.plot([], [], "o", color=_C_EE_PT, ms=11, zorder=5)
         self._trail2d, = self.ax2.plot([], [], "-", color=_C_EE_PT, lw=1, alpha=0.25)
 
-    # ------------------------------------------------------------------
-    # Internal helpers
     # ------------------------------------------------------------------
 
     @staticmethod
     def _seg3(line, p: np.ndarray, q: np.ndarray) -> None:
-        """Update a 3-D line segment from p to q in-place."""
         line.set_data([p[0], q[0]], [p[1], q[1]])
         line.set_3d_properties([p[2], q[2]])
 
@@ -195,7 +169,6 @@ class DeltaRobotSimulator:
     # ------------------------------------------------------------------
 
     def _refresh(self) -> None:
-        """Recompute geometry, update every artist, redraw."""
         try:
             geo = self.robot.geometry(*self.ee)
         except DeltaPositionError:
@@ -207,16 +180,14 @@ class DeltaRobotSimulator:
         servos  = geo["servos"]
         elbows  = geo["elbows"]
         anchors = geo["anchors"]
+        tangs   = self.robot._leg_tangs   # use instance attribute, not global
 
-        # ---- torques -------------------------------------------------
         try:
             torques = self.robot.static_torques(*self.ee, self.force)
         except (DeltaPositionError, np.linalg.LinAlgError):
             torques = np.full(3, np.nan)
 
-        # ---- 3-D artists ---------------------------------------------
-
-        # Base
+        # Base triangle
         for i in range(3):
             self._seg3(self._base[i], servos[i], servos[(i + 1) % 3])
 
@@ -224,9 +195,9 @@ class DeltaRobotSimulator:
         for i in range(3):
             self._seg3(self._arms[i], servos[i], elbows[i])
 
-        # Passive links: two parallel rods per leg, offset by ±_PLINK_W
+        # Passive links (2 rods per leg)
         for i in range(3):
-            t = LEG_TANGS[i]
+            t = tangs[i]
             self._seg3(self._links[2 * i],     elbows[i] + _PLINK_W * t, anchors[i] + _PLINK_W * t)
             self._seg3(self._links[2 * i + 1], elbows[i] - _PLINK_W * t, anchors[i] - _PLINK_W * t)
 
@@ -236,18 +207,17 @@ class DeltaRobotSimulator:
         self._ee_pt.set_data([self.ee[0]], [self.ee[1]])
         self._ee_pt.set_3d_properties([self.ee[2]])
 
-        # Force arrow — rebuild each frame (no clean set_data API for quiver3D)
+        # Force arrow
         if self._quiver is not None:
             self._quiver.remove()
             self._quiver = None
         if np.linalg.norm(self.force) > 0.01:
             self._quiver = self.ax3.quiver(
-                *self.ee, *(self.force * 4.0),  # 4 mm / N — display scale
+                *self.ee, *(self.force * 4.0),
                 color=_C_FORCE, lw=2, arrow_length_ratio=0.25,
             )
 
-
-        # ---- 2-D XY panel --------------------------------------------
+        # 2-D panel
         self._ee2d.set_data([self.ee[0]], [self.ee[1]])
         if self._dragging:
             self._trail_x.append(float(self.ee[0]))
@@ -257,7 +227,7 @@ class DeltaRobotSimulator:
                 self._trail_y.pop(0)
         self._trail2d.set_data(self._trail_x, self._trail_y)
 
-        # ---- info text -----------------------------------------------
+        # Info text
         def _ts(v: float) -> str:
             return f"{v:+9.2f}" if not np.isnan(v) else "       N/A"
 
@@ -273,7 +243,6 @@ class DeltaRobotSimulator:
             f"  Fz = {self.force[2]:+6.1f}             τ₃ = {_ts(torques[2])}\n"
         )
         self._info_txt.set_text(txt)
-
         self.fig.canvas.draw_idle()
 
     # ------------------------------------------------------------------
@@ -281,14 +250,13 @@ class DeltaRobotSimulator:
     # ------------------------------------------------------------------
 
     def _on_geometry_slider(self, _val) -> None:
-        """Rebuild the robot with new geometric parameters, then re-validate EE."""
         self.robot = DeltaRobot(
             servo_link_length=self.sl_rf.val,
             parallel_link_length=self.sl_re.val,
             servo_displacement=self.sl_f.val,
             effector_displacement=self.sl_e.val,
+            apex_angle=self.sl_apex.val,
         )
-        # If the current EE is no longer reachable, snap to the neutral pose
         try:
             self.robot.inverse(*self.ee)
         except DeltaPositionError:
@@ -298,7 +266,6 @@ class DeltaRobotSimulator:
             if fallback is not None:
                 self.ee[:] = fallback
                 self._last_valid[:] = fallback
-                # Sync Z slider without re-triggering its callback
                 self.sl_z.eventson = False
                 self.sl_z.set_val(float(self.ee[2]))
                 self.sl_z.eventson = True
@@ -330,10 +297,10 @@ class DeltaRobotSimulator:
         candidate[0] = event.xdata
         candidate[1] = event.ydata
         try:
-            self.robot.inverse(*candidate)   # reachability check
+            self.robot.inverse(*candidate)
             self.ee[:] = candidate
         except DeltaPositionError:
-            pass  # silently clamp to last valid position
+            pass
         self._refresh()
 
     def _connect_events(self) -> None:
@@ -341,8 +308,6 @@ class DeltaRobotSimulator:
         c("button_press_event",   self._on_press)
         c("motion_notify_event",  self._on_motion)
         c("button_release_event", self._on_release)
-
-    # ------------------------------------------------------------------
 
     def run(self) -> None:
         plt.show()

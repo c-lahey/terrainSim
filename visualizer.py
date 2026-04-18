@@ -15,6 +15,7 @@ Run
   python visualizer.py
 """
 
+import math
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
@@ -87,8 +88,8 @@ class DeltaRobotSimulator:
         # 2-D XY drag panel (top-right)
         self.ax2 = self.fig.add_axes([0.60, 0.67, 0.36, 0.28])
         self.ax2.set_title("XY Control — click & drag to move EE", fontsize=9)
-        self.ax2.set_xlim(-65, 65)
-        self.ax2.set_ylim(-65, 65)
+        self.ax2.set_xlim(-400, 400)
+        self.ax2.set_ylim(-400, 400)
         self.ax2.set_aspect("equal")
         self.ax2.set_xlabel("X (mm)", fontsize=8)
         self.ax2.set_ylabel("Y (mm)", fontsize=8)
@@ -115,9 +116,9 @@ class DeltaRobotSimulator:
         self.sl_apex = _mkslider(0.457, "apex angle (°)",          20, 160, r.apex_angle, "#5c6bc0")
 
         self.sl_z  = _mkslider(0.395, "Z (mm)",  -350, -50, float(self.ee[2]))
-        self.sl_fx = _mkslider(0.353, "Fx (N)",   -30,  30, 0.0)
-        self.sl_fy = _mkslider(0.311, "Fy (N)",   -30,  30, 0.0)
-        self.sl_fz = _mkslider(0.269, "Fz (N)",   -30,  30, 0.0)
+        self.sl_fx = _mkslider(0.353, "Fx (N)",   -1250,  1250, 0.0)
+        self.sl_fy = _mkslider(0.311, "Fy (N)",   -1250,  1250, 0.0)
+        self.sl_fz = _mkslider(0.269, "Fz (N)",   -1250,  1250, 0.0)
 
         for sl in (self.sl_rf, self.sl_re, self.sl_f, self.sl_e, self.sl_apex):
             sl.on_changed(self._on_geometry_slider)
@@ -231,11 +232,16 @@ class DeltaRobotSimulator:
         def _ts(v: float) -> str:
             return f"{v:+9.2f}" if not np.isnan(v) else "       N/A"
 
+        x, y = self.ee[0], self.ee[1]
+        r_xy = math.hypot(x, y)                  # mm
+        phi_xy = math.degrees(math.atan2(y, x)) # deg
+
         txt = (
             f"End-effector             Joint angles\n"
             f"  x = {self.ee[0]:+7.2f} mm        θ₁ = {thetas[0]:+7.3f}°\n"
             f"  y = {self.ee[1]:+7.2f} mm        θ₂ = {thetas[1]:+7.3f}°\n"
             f"  z = {self.ee[2]:+7.2f} mm        θ₃ = {thetas[2]:+7.3f}°\n"
+            f"  r = {r_xy:+7.2f} mm        φ  = {phi_xy:+7.3f}°\n"
             f"\n"
             f"Applied force (N)        Equilibrium torques (N·mm)\n"
             f"  Fx = {self.force[0]:+6.1f}             τ₁ = {_ts(torques[0])}\n"

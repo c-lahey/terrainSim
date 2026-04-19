@@ -1,0 +1,11 @@
+{
+  "autodeskProduct": "Fusion360",
+  "type": "addin",
+  "id": "TripteronIK",
+  "author": "",
+  "description": {
+    "": "Interactive Tripteron IK solver: drag the EE triad, watch sliders update, get actuator force estimates."
+  },
+  "version": "1.0.0",
+  "runOnStartup": false
+}

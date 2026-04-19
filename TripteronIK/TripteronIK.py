@@ -326,8 +326,7 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
             mat.translation = adsk.core.Vector3D.create(
                 float(ee[0]), float(ee[1]), float(ee[2])
             )
-            triad = inputs.addTriadCommandInput("eeTriad", "EE Target")
-            triad.transform = mat
+            triad = inputs.addTriadCommandInput("eeTriad", "EE Target", mat)
             try:
                 triad.isXRotationEnabled = False
                 triad.isYRotationEnabled = False

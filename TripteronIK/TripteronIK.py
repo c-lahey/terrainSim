@@ -6,27 +6,28 @@ end-effector occurrence and drives the three slider joints to match the dragged
 target position.  A finite-difference Jacobian built from Fusion's own FK engine
 (transform2) gives actuator force estimates via τ = Jᵀ F.
 
+No third-party packages required — all math uses the Python standard library.
+
 Assumptions
 -----------
 * The open design contains exactly three slider-type joints.
 * At least one occurrence has "ee" anywhere in its name (case-insensitive) —
   that occurrence is treated as the end-effector platform.
-* numpy is available (bundled with Fusion 360).
 """
 
 import adsk.core
 import adsk.fusion
 import traceback
-import numpy as np
+import math
 
 # ---------------------------------------------------------------------------
 # Module-level globals (kept alive to prevent GC of event handlers)
 # ---------------------------------------------------------------------------
-_app: "adsk.core.Application | None" = None
-_ui:  "adsk.core.UserInterface | None" = None
-_handlers: list = []
-_robot:    "RobotModel | None" = None
-_cmd_def:  "adsk.core.CommandDefinition | None" = None
+_app      = None
+_ui       = None
+_handlers = []
+_robot    = None
+_cmd_def  = None
 
 CMD_ID       = "TripteronIK_Cmd"
 CMD_NAME     = "Tripteron IK"
@@ -34,145 +35,206 @@ CMD_DESC     = "Drive slider joints via EE triad; estimate actuator forces."
 WORKSPACE_ID = "FusionSolidEnvironment"
 PANEL_ID     = "SolidScriptsAddinsPanel"
 
-# Numerical parameters
-FD_EPS   = 5e-4   # finite-difference step for Jacobian (cm; ~5 µm)
-IK_TOL   = 1e-4   # Newton IK position tolerance (cm; ~1 µm)
-IK_ITER  = 10     # max Newton iterations (converges in 2-3 for small moves)
+FD_EPS  = 5e-4   # finite-difference step (cm ≈ 5 µm)
+IK_TOL  = 1e-4   # Newton convergence tolerance (cm ≈ 1 µm)
+IK_ITER = 10     # max Newton iterations
 
 
 # ---------------------------------------------------------------------------
-# Robot model: wraps the three slider joints and the EE occurrence
+# Pure-Python 3-D vector / 3×3 matrix helpers
+# Vectors are plain [x, y, z] lists.
+# Matrices are lists of 3 rows: [[r00,r01,r02], [r10,...], [r20,...]].
+# ---------------------------------------------------------------------------
+
+def _norm(v):
+    return math.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
+
+def _sub(a, b):
+    return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]
+
+def _add(a, b):
+    return [a[0]+b[0], a[1]+b[1], a[2]+b[2]]
+
+def _scale(v, s):
+    return [v[0]*s, v[1]*s, v[2]*s]
+
+def _dot(a, b):
+    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
+
+def _zeros33():
+    return [[0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0],
+            [0.0, 0.0, 0.0]]
+
+def _eye3():
+    return [[1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+            [0.0, 0.0, 1.0]]
+
+def _set_col(M, col, v):
+    """Write vector v into column col of matrix M in-place."""
+    for row in range(3):
+        M[row][col] = v[row]
+
+def _col_div(v, s):
+    return [v[0]/s, v[1]/s, v[2]/s]
+
+def _matvec(M, v):
+    """3×3 M times 3-vector v."""
+    return [_dot(M[i], v) for i in range(3)]
+
+def _transpose_matvec(M, v):
+    """Mᵀ times v — columns of M dotted with v."""
+    return [
+        M[0][0]*v[0] + M[1][0]*v[1] + M[2][0]*v[2],
+        M[0][1]*v[0] + M[1][1]*v[1] + M[2][1]*v[2],
+        M[0][2]*v[0] + M[1][2]*v[1] + M[2][2]*v[2],
+    ]
+
+def _solve3(M, b):
+    """
+    Solve 3×3 linear system M·x = b.
+    Uses Gaussian elimination with partial pivoting.
+    Raises ValueError if M is singular.
+    """
+    # Build augmented matrix [M | b], working on copies
+    A = [list(M[i]) + [b[i]] for i in range(3)]
+
+    for col in range(3):
+        # Partial pivot
+        pivot = max(range(col, 3), key=lambda r: abs(A[r][col]))
+        A[col], A[pivot] = A[pivot], A[col]
+        if abs(A[col][col]) < 1e-14:
+            raise ValueError("Singular Jacobian — configuration may be at a singularity.")
+        inv = 1.0 / A[col][col]
+        for row in range(col + 1, 3):
+            f = A[row][col] * inv
+            A[row] = [A[row][j] - f * A[col][j] for j in range(4)]
+
+    # Back-substitution
+    x = [0.0, 0.0, 0.0]
+    for i in range(2, -1, -1):
+        x[i] = (A[i][3] - A[i][i+1]*x[i+1] - A[i][i+2]*x[i+2] if i < 2
+                else A[i][3])
+        x[i] /= A[i][i]
+    # Fix: back-sub only subtracts columns > i, handle cleanly
+    x = [0.0, 0.0, 0.0]
+    for i in range(2, -1, -1):
+        s = A[i][3]
+        for j in range(i + 1, 3):
+            s -= A[i][j] * x[j]
+        x[i] = s / A[i][i]
+    return x
+
+
+# ---------------------------------------------------------------------------
+# Robot model
 # ---------------------------------------------------------------------------
 class RobotModel:
     """
-    Stateful wrapper around Fusion's joints and EE occurrence.
+    Wraps the three slider joints and the EE occurrence.
+    All positions in Fusion internal units (cm).
 
-    All positions are in Fusion internal units (cm).
-
-    The FK oracle is Fusion itself: we set jointMotion.slideValue on each
-    slider joint, Fusion re-solves the constrained assembly, and we read the
-    EE position back via occurrence.transform2.
+    FK oracle: set jointMotion.slideValue → Fusion re-solves → read transform2.
     """
 
-    def __init__(self, slider_joints: list, ee_occ: adsk.fusion.Occurrence):
+    def __init__(self, slider_joints, ee_occ):
         if len(slider_joints) != 3:
             raise ValueError(f"Need exactly 3 slider joints; got {len(slider_joints)}.")
         self.joints  = slider_joints
         self.ee_occ  = ee_occ
 
-        # Snapshot of the reference configuration
-        self.s_ref  = np.array([j.jointMotion.slideValue for j in self.joints], dtype=float)
-        self.ee_ref = self._read_ee()
-
-        # Warm-start cache: last solved configuration
-        self._last_s = self.s_ref.copy()
+        self.s_ref   = [j.jointMotion.slideValue for j in self.joints]
+        self.ee_ref  = self._read_ee()
+        self._last_s = list(self.s_ref)
 
     # ------------------------------------------------------------------
-    def _read_ee(self) -> np.ndarray:
-        """Read EE world position from transform2 (cm)."""
+    def _read_ee(self):
+        """Return EE world position as [x, y, z] (cm)."""
         t = self.ee_occ.transform2.translation
-        return np.array([t.x, t.y, t.z])
+        return [t.x, t.y, t.z]
 
-    def fk(self, s: np.ndarray) -> np.ndarray:
-        """Set slider values, let Fusion solve, return EE position (cm)."""
+    def fk(self, s):
+        """Set slider values, Fusion solves, return EE position [x,y,z]."""
         for i, jt in enumerate(self.joints):
             jt.jointMotion.slideValue = float(s[i])
-        self._last_s = np.array(s, dtype=float)
+        self._last_s = list(s)
         return self._read_ee()
 
     # ------------------------------------------------------------------
-    def jacobian_fd(self, s: np.ndarray) -> tuple:
+    def jacobian_fd(self, s):
         """
-        Forward-difference 3×3 Jacobian J where J[:,i] = ∂x_ee/∂s_i.
-
-        Returns (J, p0) where p0 is the EE position at s.
-        Restores joint configuration to s on exit.
+        Forward-difference Jacobian: J[:,i] = (FK(s+ε·eᵢ) − FK(s)) / ε.
+        Returns (J, p0).  Restores joints to s on exit.
         """
         p0 = self.fk(s)
-        J  = np.zeros((3, 3))
+        J  = _zeros33()
         for i in range(3):
-            sp       = s.copy()
-            sp[i]   += FD_EPS
-            J[:, i]  = (self.fk(sp) - p0) / FD_EPS
+            sp    = list(s)
+            sp[i] += FD_EPS
+            dp    = _sub(self.fk(sp), p0)
+            _set_col(J, i, _col_div(dp, FD_EPS))
         self.fk(s)   # restore
         return J, p0
 
     # ------------------------------------------------------------------
-    def solve_ik(
-        self,
-        target: np.ndarray,
-        s0:     "np.ndarray | None" = None,
-    ) -> tuple:
+    def solve_ik(self, target, s0=None):
         """
-        Newton-Raphson IK: find slider values so FK(s) ≈ target.
-
-        Returns (s_best, residual_cm, J_at_best) where J is the 3×3
-        Jacobian at the returned configuration (used for force estimation
-        without an extra round of finite differences).
+        Newton-Raphson IK.  Returns (s_best, residual_cm, J_at_best).
+        Leaves Fusion in the best-found configuration.
         """
-        s = (s0 if s0 is not None else self._last_s).copy()
-        best_s, best_err, best_J = s.copy(), np.inf, np.eye(3)
+        s = list(s0 if s0 is not None else self._last_s)
+        best_s, best_err, best_J = list(s), float("inf"), _eye3()
 
         for _ in range(IK_ITER):
-            J, p   = self.jacobian_fd(s)   # also evaluates fk(s)
-            err_v  = target - p
-            err    = float(np.linalg.norm(err_v))
+            J, p  = self.jacobian_fd(s)
+            err_v = _sub(target, p)
+            err   = _norm(err_v)
             if err < best_err:
-                best_s, best_err, best_J = s.copy(), err, J.copy()
+                best_s, best_err, best_J = list(s), err, [list(r) for r in J]
             if err < IK_TOL:
                 break
             try:
-                s = s + np.linalg.solve(J, err_v)
-            except np.linalg.LinAlgError:
-                break   # singular Jacobian — stop here
+                ds = _solve3(J, err_v)
+                s  = _add(s, ds)
+            except ValueError:
+                break   # singular — stop at best so far
 
-        # Leave Fusion in the best-found configuration
         self.fk(best_s)
         return best_s, best_err, best_J
 
     # ------------------------------------------------------------------
-    def static_forces(self, J: np.ndarray, force: np.ndarray) -> np.ndarray:
-        """
-        Actuator force estimates from virtual work: τ = Jᵀ F.
-
-        J     : 3×3 Jacobian ∂x_ee/∂s (already computed by solve_ik).
-        force : (3,) EE force vector [Fx, Fy, Fz] in Newtons.
-        Returns (3,) actuator forces in N (positive = push in slide direction).
-        """
-        return J.T @ np.asarray(force, dtype=float)
+    def static_forces(self, J, force):
+        """τ = Jᵀ F.  Returns [τ_A, τ_B, τ_C] in Newtons."""
+        return _transpose_matvec(J, force)
 
     def restore_ref(self):
-        """Reset joints to the configuration recorded at startup."""
         self.fk(self.s_ref)
 
 
 # ---------------------------------------------------------------------------
 # Joint / occurrence discovery
 # ---------------------------------------------------------------------------
-def _is_slider_joint(j) -> bool:
+def _is_slider_joint(j):
     try:
         return "sliderjointmotion" in j.jointMotion.objectType.lower()
     except Exception:
         return False
 
 
-def find_robot_components(design: adsk.fusion.Design):
-    """
-    Scan root component for 3 slider joints and an EE occurrence.
-    Returns (slider_joints, ee_occ) or raises RuntimeError with a hint.
-    """
-    root     = design.rootComponent
-    sliders  = []
-    seen_tok: set = set()
+def find_robot_components(design):
+    root    = design.rootComponent
+    sliders = []
+    seen:   set = set()
 
     def _collect(j):
         try:
             tok = j.entityToken
         except Exception:
             tok = str(id(j))
-        if tok in seen_tok:
+        if tok in seen:
             return
-        seen_tok.add(tok)
+        seen.add(tok)
         if _is_slider_joint(j):
             sliders.append(j)
 
@@ -189,11 +251,9 @@ def find_robot_components(design: adsk.fusion.Design):
             "Make sure all prismatic joints are defined in the root component."
         )
 
-    # Stable ordering by joint name
     sliders.sort(key=lambda j: getattr(j, "name", ""))
     sliders = sliders[:3]
 
-    # EE occurrence: first one whose name contains "ee"
     ee_occ = None
     try:
         for i in range(root.allOccurrences.count):
@@ -207,7 +267,7 @@ def find_robot_components(design: adsk.fusion.Design):
     if ee_occ is None:
         raise RuntimeError(
             "No occurrence with 'ee' in its name found.\n"
-            "Rename the end-effector platform occurrence so its name contains 'ee' "
+            "Rename the end-effector occurrence so its name contains 'ee' "
             "(e.g. 'tripteron ee v6:1')."
         )
 
@@ -218,52 +278,49 @@ def find_robot_components(design: adsk.fusion.Design):
 # Result formatting
 # ---------------------------------------------------------------------------
 def _format_results(robot, s_sol, err_cm, tau):
-    """Build a human-readable summary string for the text-box input."""
     if s_sol is None:
         return (
             "Drag the triad to a target EE position.\n"
             "Set Fx / Fy / Fz to apply a static load."
         )
 
-    mm   = 10.0      # cm → mm
-    s_mm = s_sol * mm
-    ref  = robot.s_ref * mm
+    mm  = 10.0
+    ref = robot.s_ref
 
     lines = [
-        f"Slider A: {s_mm[0]:7.3f} mm  ({s_mm[0]-ref[0]:+.3f})",
-        f"Slider B: {s_mm[1]:7.3f} mm  ({s_mm[1]-ref[1]:+.3f})",
-        f"Slider C: {s_mm[2]:7.3f} mm  ({s_mm[2]-ref[2]:+.3f})",
+        f"Slider A: {s_sol[0]*mm:7.3f} mm  ({(s_sol[0]-ref[0])*mm:+.3f})",
+        f"Slider B: {s_sol[1]*mm:7.3f} mm  ({(s_sol[1]-ref[1])*mm:+.3f})",
+        f"Slider C: {s_sol[2]*mm:7.3f} mm  ({(s_sol[2]-ref[2])*mm:+.3f})",
         f"IK residual: {err_cm*mm:.4f} mm",
     ]
 
     if tau is not None:
         lines += [
             "────────────────────────────",
-            f"  τ_A: {tau[0]:+8.3f} N",
-            f"  τ_B: {tau[1]:+8.3f} N",
-            f"  τ_C: {tau[2]:+8.3f} N",
+            f"  \u03c4_A: {tau[0]:+8.3f} N",
+            f"  \u03c4_B: {tau[1]:+8.3f} N",
+            f"  \u03c4_C: {tau[2]:+8.3f} N",
         ]
     return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
-# Command event handlers
+# Command handlers
 # ---------------------------------------------------------------------------
 class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
-    def notify(self, args: adsk.core.CommandCreatedEventArgs):
+    def notify(self, args):
         global _robot
         try:
             cmd    = args.command
             inputs = cmd.commandInputs
             cmd.isRepeatable = False
 
-            # Discover robot kinematics
             app    = adsk.core.Application.get()
             design = adsk.fusion.Design.cast(app.activeProduct)
             sliders, ee_occ = find_robot_components(design)
             _robot = RobotModel(sliders, ee_occ)
 
-            # ---- Triad at current EE position ----
+            # Triad at current EE position
             ee  = _robot.ee_ref
             mat = adsk.core.Matrix3D.create()
             mat.translation = adsk.core.Vector3D.create(
@@ -271,93 +328,62 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
             )
             triad = inputs.addTriadCommandInput("eeTriad", "EE Target")
             triad.transform = mat
-            # This is a 3T robot — disable rotation handles
             try:
                 triad.isXRotationEnabled = False
                 triad.isYRotationEnabled = False
                 triad.isZRotationEnabled = False
             except Exception:
-                pass  # older API versions may not expose these flags
+                pass
 
-            # ---- Applied-force spinners (values are raw Newtons) ----
-            inputs.addFloatSpinnerCommandInput(
-                "Fx", "Fx  (N)", "", -500.0, 500.0, 1.0, 0.0
-            )
-            inputs.addFloatSpinnerCommandInput(
-                "Fy", "Fy  (N)", "", -500.0, 500.0, 1.0, 0.0
-            )
-            inputs.addFloatSpinnerCommandInput(
-                "Fz", "Fz  (N)", "", -500.0, 500.0, 1.0, 0.0
-            )
+            # Force spinners
+            inputs.addFloatSpinnerCommandInput("Fx", "Fx  (N)", "", -500.0, 500.0, 1.0, 0.0)
+            inputs.addFloatSpinnerCommandInput("Fy", "Fy  (N)", "", -500.0, 500.0, 1.0, 0.0)
+            inputs.addFloatSpinnerCommandInput("Fz", "Fz  (N)", "", -500.0, 500.0, 1.0, 0.0)
 
-            # ---- Read-only results panel ----
+            # Read-only results box
             inputs.addTextBoxCommandInput(
                 "results", "Results",
                 _format_results(_robot, None, None, None),
                 9, True
             )
 
-            # Wire up sub-handlers
-            for evname, handler_cls in [
+            for evname, cls in [
                 ("executePreview", _PreviewHandler),
                 ("execute",        _ExecuteHandler),
                 ("destroy",        _DestroyHandler),
             ]:
-                h = handler_cls()
+                h = cls()
                 getattr(cmd, evname).add(h)
                 _handlers.append(h)
 
         except Exception:
             if _ui:
-                _ui.messageBox(
-                    f"TripteronIK — setup error:\n{traceback.format_exc()}"
-                )
+                _ui.messageBox(f"TripteronIK — setup error:\n{traceback.format_exc()}")
 
 
 class _PreviewHandler(adsk.core.CommandEventHandler):
-    """
-    Called whenever any command input changes.
-
-    Workflow:
-      1. Read desired EE position from the triad transform.
-      2. Solve IK via Newton iteration (Fusion is the FK oracle).
-      3. The FK oracle leaves Fusion in the solved configuration → live preview.
-      4. Compute Jᵀ F for the applied force.
-      5. Write results to the text box.
-    """
-
-    def notify(self, args: adsk.core.CommandEventArgs):
+    def notify(self, args):
         if _robot is None:
             return
         try:
             inputs = args.command.commandInputs
 
-            # --- Target position from triad ---
             triad  = inputs.itemById("eeTriad")
             t      = triad.transform.translation
-            target = np.array([t.x, t.y, t.z])
+            target = [t.x, t.y, t.z]
 
-            # --- IK ---
             s_sol, err_cm, J = _robot.solve_ik(target)
-            # fk(s_sol) was already called inside solve_ik; Fusion now shows the pose.
 
-            # --- Static force estimation ---
             Fx  = inputs.itemById("Fx").value
             Fy  = inputs.itemById("Fy").value
             Fz  = inputs.itemById("Fz").value
-            F   = np.array([Fx, Fy, Fz])
-            tau = _robot.static_forces(J, F) if np.linalg.norm(F) > 1e-9 else None
+            F   = [Fx, Fy, Fz]
+            tau = _robot.static_forces(J, F) if _norm(F) > 1e-9 else None
 
-            # --- Update display ---
-            inputs.itemById("results").text = _format_results(
-                _robot, s_sol, err_cm, tau
-            )
-
-            # Signal that the preview is a valid model state
+            inputs.itemById("results").text = _format_results(_robot, s_sol, err_cm, tau)
             args.isValidResult = True
 
         except Exception:
-            # Swallow errors silently so Fusion isn't disrupted by bad drags.
             try:
                 inputs.itemById("results").text = (
                     "IK error — position may be outside workspace.\n"
@@ -368,24 +394,22 @@ class _PreviewHandler(adsk.core.CommandEventHandler):
 
 
 class _ExecuteHandler(adsk.core.CommandEventHandler):
-    """Commit the IK solution when the user clicks OK."""
-
-    def notify(self, args: adsk.core.CommandEventArgs):
+    def notify(self, args):
         if _robot is None:
             return
         try:
             inputs = args.command.commandInputs
             triad  = inputs.itemById("eeTriad")
             t      = triad.transform.translation
-            target = np.array([t.x, t.y, t.z])
+            target = [t.x, t.y, t.z]
             s_sol, _, _ = _robot.solve_ik(target)
-            _robot.fk(s_sol)   # apply final configuration
+            _robot.fk(s_sol)
         except Exception:
             pass
 
 
 class _DestroyHandler(adsk.core.CommandEventHandler):
-    def notify(self, args: adsk.core.CommandEventArgs):
+    def notify(self, args):
         global _robot
         _robot = None
 
@@ -400,7 +424,6 @@ def run(context):
         _app = adsk.core.Application.get()
         _ui  = _app.userInterface
 
-        # Clean up any stale definition from a previous load
         stale = _ui.commandDefinitions.itemById(CMD_ID)
         if stale:
             stale.deleteMe()
@@ -413,7 +436,6 @@ def run(context):
         _cmd_def.commandCreated.add(on_created)
         _handlers.append(on_created)
 
-        # Place the button in the ADD-INS panel of the Design workspace
         workspace    = _ui.workspaces.itemById(WORKSPACE_ID)
         addins_panel = workspace.toolbarPanels.itemById(PANEL_ID)
         ctrl = addins_panel.controls.addCommand(_cmd_def)
@@ -421,9 +443,7 @@ def run(context):
 
     except Exception:
         if _ui:
-            _ui.messageBox(
-                f"TripteronIK — failed to start:\n{traceback.format_exc()}"
-            )
+            _ui.messageBox(f"TripteronIK — failed to start:\n{traceback.format_exc()}")
 
 
 def stop(context):
@@ -436,13 +456,11 @@ def stop(context):
             ctrl = addins_panel.controls.itemById(CMD_ID)
             if ctrl:
                 ctrl.deleteMe()
-
         if _cmd_def:
             _cmd_def.deleteMe()
-
     except Exception:
         pass
     finally:
         _handlers.clear()
-        _robot    = None
-        _cmd_def  = None
+        _robot   = None
+        _cmd_def = None

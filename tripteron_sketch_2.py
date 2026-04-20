@@ -4,7 +4,7 @@ import numpy as np
 # ============================================================
 # Load rich Fusion export
 # ============================================================
-JSON_PATH = "c:/Users/charl/Desktop/fusion_kinematics_rich_export.json"
+JSON_PATH = "fusion_kinematics_rich_export.json"
 
 with open(JSON_PATH, "r", encoding="utf-8") as f:
     data = json.load(f)

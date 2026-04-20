@@ -1,0 +1,1675 @@
+{
+  "document_name": "Tripteron Assem v6",
+  "root_component": "Tripteron Assem v6",
+  "unit_note": "Fusion geometric values are typically in cm and rad unless otherwise documented by property.",
+  "occurrences": [
+    {
+      "name": "tripteron link v4:1",
+      "full_path_name": "tripteron link v4:1",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOuw1CMQxFS7onUdBnAaPY+Ty7REDLAHSJ87IEEh0lG7AEG7AEHQiJigWQKAkg5Obq6ugeW+MNGTS2HRK3hL8mmovedTOb744Lemxf02cjyLhoQrSOOUUoJQt4TAmSaIQcKDMJDtnHttLIvgxZiwSwUrGRRSDXSKA9pyJaODbj13UddatxXd7258Np3XWTv4t9rgF7BqzowDslEI8IpAV7CaKDdZ/f3/RXZvjHAAAA",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "tripteron link v4",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          0.015617378608784722,
+          0.8658845751515737,
+          -0.5000000000000084,
+          63.24487296940184
+        ],
+        [
+          -0.8111580135496985,
+          0.30335239747546044,
+          0.5000000000000009,
+          28.69258250811686
+        ],
+        [
+          0.5846184863135184,
+          0.39777031747048036,
+          0.7071067811865543,
+          40.517518419563295
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tripteron link v4:2",
+      "full_path_name": "tripteron link v4:2",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOMQpCMRBES7uAhX0usJLdJPuTUtTWA9glm+QSgp2lN/AS3sBL2CmClRcQLI18ZJpheMyM0U6TRm26kEJ3OCasb/KU3WJ5OK/otf/M350gbVl7NjaExFBKjuAwJUhRGLKnHChizY57SyeLJGzFMFTrEVyVBtFjBRbM4hOnUOu4dZ+ozbStH8fr6bJVavbfCi43j0MAbGjBWSGIDhFICg7RR6nG/r5/AZo5wUHHAAAA",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "tripteron link v4",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          -0.7159900603410169,
+          -0.487194246161559,
+          -0.4999999999999743,
+          62.68889951939545
+        ],
+        [
+          0.22066778684076416,
+          -0.8374399846262573,
+          0.5000000000000172,
+          -7.123561871375328
+        ],
+        [
+          -0.6623171153938856,
+          0.24766113675011153,
+          0.7071067811865418,
+          69.0423268380312
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "fuckass v2:2",
+      "full_path_name": "fuckass v2:2",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOLQ5CMRCEr1IJYqG73W5bSeAeZPvzLkGCw+Hx3ADNPVBPoRAIDAmGhBJCxkwmX2bGGjZk0NgupNgd/hIxY7mWzWK5O63otn3Nnp0g48R4sS5GFag1J2BUBU1FIHvKkRK2zNJbOilWKTkKEIQ9sKYGsaKDQSMmVfFcht9Wnh/O93E12R/fl7V9TP9bVlRYC0KrZQBuNYBSduC0B843CTl8v38A469m88cAAAA=",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "fuckass v2",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          6.123233995736772e-17,
+          1.2246467991473532e-16,
+          -1.0,
+          33.898152185415526
+        ],
+        [
+          0.0,
+          1.0,
+          1.2246467991473532e-16,
+          4.665904304751409e-16
+        ],
+        [
+          1.0,
+          -3.749399456654648e-33,
+          6.123233995736772e-17,
+          -1.905
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tripteron link v4:3",
+      "full_path_name": "tripteron link v4:3",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOMQpCMRBES7sPFva5wEp2s8nPlqK2HsAum/xcQrCz9AZewht4CTtFsPICgqWRj0wzDI+ZsYYNGTS2CSk2h2MSzC0/826xPJxX9Np/5u9GkHHB+GBdjClAKSrAmBIkyQHUk0YSHJRDa2mk+iQ1koOkmoDZOZCKAtWyt30sSkLj1n3SbaZ1/TheT5dt183+W5G1euwjYEUH7DKBMCJQLtiLlzxY9/v+BVJpuAjHAAAA",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "tripteron link v4",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          -0.7639967542854085,
+          0.4078099550543185,
+          -0.4999999999999745,
+          71.72154023900586
+        ],
+        [
+          0.12982132811046107,
+          0.8562396993644308,
+          0.50000000000002,
+          -2.970061778225872
+        ],
+        [
+          0.6320248272093474,
+          0.31708771308746375,
+          -0.7071067811865437,
+          -29.55736342223413
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tripteron link v4:4",
+      "full_path_name": "tripteron link v4:4",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOvQlCQRCEQ7MHBubXwMrt3t6+vVDU1ALM7uddE4KZoR3YhB3YhJkiGNmAYOjJQyYZho+ZsYYNGTS2CUmbwzERc8vPvFssD+cVvfaf+bsRZJwYL9apRoFSUgDGGCGGLJA8JaWAQ2JpLY1UJaUGgIpNwMoRQmaGoaItVYrj6sat+6TbTOv6cbyeLtuum/23lFP12CtgRQfsMkFgRKBcsA8+5MG63/cvYLn6RscAAAA=",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "tripteron link v4",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          0.21318169881023985,
+          -0.8393768898965155,
+          -0.4999999999999808,
+          63.24487296940163
+        ],
+        [
+          -0.720311554819392,
+          -0.4807819297703488,
+          0.5000000000000188,
+          28.692582508116693
+        ],
+        [
+          -0.6600794098334111,
+          0.25356492800454433,
+          -0.707106781186547,
+          2.4175184195632817
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tripteron ee v10:1",
+      "full_path_name": "tripteron ee v10:1",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zVOOwoCMRDtPIG15AIjmclkNlOKWgjCniE/e2vBzt47eIJtBS9hbWXlBQRLI4u85vF4P2vYkEFjG5BCYzgqYh75mQ+L5WlY0ev4mb+bg4wT48W6EKJAKUmBMUaImgWSpxRIsSaW1tKcuNPKuxohk3hgHzIErwicuoxVpQjhuHWd3fvbdrMezvtJP9XLf6skQrLioHNcWs4HUOsTCIvaKKV2UX/fv7RMPZnHAAAA",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "tripteron ee v10",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          -1.0000000000000002,
+          -8.6131481295757e-15,
+          5.033838341692501e-15,
+          99.76671929676014
+        ],
+        [
+          8.03028104164751e-15,
+          -1.0000000000000004,
+          4.995107337371343e-15,
+          32.50258250811636
+        ],
+        [
+          5.050097181456642e-15,
+          5.399944235754335e-15,
+          1.0000000000000002,
+          -1.3924815804369324
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "fuckass mirrored v1:1",
+      "full_path_name": "fuckass mirrored v1:1",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOPQoCQQyFrzIXiEwys9lJ6Q94jsnMbuUNBMFCbC3ExsojeAXxDjZWFiL2gqURkTSPx8f74l105NB5O6RkCX8Nu2u5lflwvDpO6LF4D15GkAvsGvYhpcxQqwpEzBmyFAZtSBMJdhrZVozsVaJKIPBtb2TiDiTmADFyUQw9F9/+XOvnsj2NpoftZref3c+XvyshepRIUFBsQbyapmZoKFBqu0xU6vf3D5rGDSLHAAAA",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "fuckass mirrored v1",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          6.123233995736766e-17,
+          1.2246467991473532e-16,
+          -1.0,
+          27.0603775129427
+        ],
+        [
+          0.0,
+          1.0,
+          1.2246467991473532e-16,
+          4.665904304751416e-16
+        ],
+        [
+          1.0,
+          -3.749399456654644e-33,
+          6.123233995736766e-17,
+          32.385
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "fuckass2 v4:1",
+      "full_path_name": "fuckass2 v4:1",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOqw1CQRBFDQ3gkNvAkJ39zJuVBEIBdLCznw5QJChogR6QrwQwNEEQKCSGBIFggZAxNzcn94xWThmFSrdDwy3hryF1Tte0mky3/czc1s/xoxFGWVKetGWOBDlLAIcxQgyJQLwRNgGLOGorjRRbJTlbwYfUSMECHNBDRecYM9ZSws91GO4Xp918ubkM+td9dPy7OjHJayQo2TO47qtpC5KZU+FOF6bP72/N7G17xwAAAA==",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "fuckass2 v4",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          -6.123233995736766e-17,
+          -1.405799628556214e-65,
+          1.0,
+          126.33640425330427
+        ],
+        [
+          0.0,
+          1.0,
+          5.27090436347397e-98,
+          0.0
+        ],
+        [
+          -1.0,
+          -3.749399456654644e-33,
+          -6.123233995736766e-17,
+          40.601480790919815
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tripteron link v4:5",
+      "full_path_name": "tripteron link v4:5",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOsQkCQRBFQ7MDA/NtYGRndm5vJhQ1tQCz3bnbJgQzQzuwCTuwCTNFMLIBwdCVQ37y+Tz+/96xI4fOVyFJdTgm0d3sabvF8nBe0Wv/mb8rQS5E10YfRFKEvs8KjClBUouQW8pCikPmWFsqGdQ0cRcAPTJwKgxJDGEQppSLR4lh3LpPms20rB/H6+mybZrZf0s4lxY7ASwYgIMRKCMCWY+dtmqDD7/vXx3GgnzHAAAA",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "tripteron link v4",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          0.2607161967386069,
+          -0.6572876575428661,
+          0.7071067811865959,
+          112.51145973841518
+        ],
+        [
+          -0.26071619673862434,
+          0.6572876575428688,
+          0.7071067811866018,
+          15.729944514889912
+        ],
+        [
+          -0.9295451196776147,
+          -0.36870838135811707,
+          -7.443926436827833e-15,
+          81.19528366258035
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tripteron link v4:6",
+      "full_path_name": "tripteron link v4:6",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOPQpCMRCES7sHFva5wEp2s9kkpaitB7DL7yUEO0tv4CW8gZewUwQrLyBYGnnINMPwMTNasSKFSnch+e5wTETd8jPvFsvDeUWv/Wf+7gQpI8qKNt5HgVJSAMYYIYYskCwlTwFrYuktnaxCJaMTMBa5k0lDalyhBu1K0dVjc+PWfTJspm39OF5Pl+0wzP5bnlOz6DxgQwNsMkFgRKBc0AUbctXm9/0La8OQqMcAAAA=",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "tripteron link v4",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          -0.32280597588461507,
+          -0.6291234393449284,
+          0.7071067811865659,
+          124.43140425330427
+        ],
+        [
+          0.32280597588460713,
+          0.6291234393449325,
+          0.7071067811865693,
+          3.810000000000016
+        ],
+        [
+          -0.8897149003284239,
+          0.4565165891111167,
+          -7.265413615895223e-15,
+          0.5964807909198327
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tripteron link v4:8",
+      "full_path_name": "tripteron link v4:8",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOuwmCQRCEQ7MfDMyvgZXbvb3HhqKmFmB2zyYEM0M7sAk7sAkzRTCyAcHQkx+ZZBg+ZkYrVqRQ6S6k0B2OiVO3/My7xfJwXtFr/5m/O0HKOGWdNiFEB6UkAcYYIUp2kCylQII1sestnQxI0UutEJgrcCoNpImBml2xtZeQN+PWfTJspm39OF5Pl+0wzP5bgVOz6ANgQwNsMoEwIlAu6MVKrtr8vn8BPqtINccAAAA=",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "tripteron link v4",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          -0.2607161967385333,
+          0.6572876575428668,
+          0.7071067811865619,
+          107.87666381164588
+        ],
+        [
+          0.26071619673853813,
+          -0.6572876575428627,
+          0.7071067811865671,
+          16.772637993230475
+        ],
+        [
+          0.9295451196775766,
+          0.36870838135798195,
+          -7.38369302957301e-15,
+          -40.08128445209569
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tripteron link v4:9",
+      "full_path_name": "tripteron link v4:9",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zWOvQlCQRCEQ7MHBubXwMrbvZ+3G4qaWoDZ3d5dE4KZoR3YhB3YhJkiGNmAYOjJQyYZho+Z6Y0zZND0TUjcHI5JMDd96m6xPJxX9Np/5u9GkLHB+NBb5hgg5yTgMEaIogGSp8QkWJILraWRmmVAlQy+em0kKbAiAdUohbQksjxu3SfdZlrXj+P1dNl23ey/xS5VjwMDVrTgrBKIQwTSjIN40dLb3/cvZnafuccAAAA=",
+      "object_type": "adsk::fusion::Occurrence",
+      "component_name": "tripteron link v4",
+      "is_grounded": false,
+      "is_visible": true,
+      "is_referenced_component": true,
+      "transform_world": [
+        [
+          0.32280597588453624,
+          0.6291234393449524,
+          0.7071067811865647,
+          95.95671929676033
+        ],
+        [
+          -0.3228059758845263,
+          -0.6291234393449604,
+          0.7071067811865688,
+          28.692582508116608
+        ],
+        [
+          0.8897149003284611,
+          -0.45651658911099363,
+          -7.386238015242408e-15,
+          40.517518419563096
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ],
+  "joints": [
+    {
+      "name": "Revolute 2",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3szMCADp4P0fiAAAAA==",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron link v4:2",
+      "occurrence_two": "tripteron link v4:1",
+      "is_flipped": true,
+      "is_suppressed": false,
+      "angle_parameter_value": 0.0,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          0.5000000000000084,
+          -0.5000000000000009,
+          -0.7071067811865543
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 2.1863138704864173,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          62.688899519395434,
+          -7.123561871375324,
+          69.0423268380312
+        ],
+        "x_axis_world": [
+          1.0,
+          2.7755575615628914e-17,
+          -5.551115123125783e-17
+        ],
+        "y_axis_world": [
+          0.0,
+          0.9999999999999998,
+          5.551115123125783e-17
+        ],
+        "z_axis_world": [
+          -1.1102230246251565e-16,
+          5.551115123125783e-17,
+          1.0
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          62.688899519395456,
+          -7.1235618713753475,
+          69.0423268380312
+        ],
+        "x_axis_world": [
+          0.9999999999999999,
+          -5.551115123125783e-17,
+          5.551115123125783e-17
+        ],
+        "y_axis_world": [
+          0.0,
+          -0.9999999999999998,
+          0.0
+        ],
+        "z_axis_world": [
+          -0.0,
+          0.0,
+          -0.9999999999999998
+        ]
+      }
+    },
+    {
+      "name": "Slider 8",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3tDEwhgA+i2n0IkAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "fuckass v2:2",
+      "occurrence_two": null,
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": 3.141592653589793,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::SliderJointMotion",
+        "joint_type": "slider",
+        "rotation_axis_world": null,
+        "slide_direction_world": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "rotation_value": null,
+        "slide_value": -0.39184781458447304,
+        "rotation_limits": null,
+        "slide_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        }
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          37.70815218541553,
+          -9.860761315262648e-31,
+          -2.220446049250313e-16
+        ],
+        "x_axis_world": [
+          0.0,
+          -4.591690043316945e-49,
+          1.0
+        ],
+        "y_axis_world": [
+          0.0,
+          -1.0,
+          2.2958450216584724e-49
+        ],
+        "z_axis_world": [
+          1.0,
+          0.0,
+          0.0
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          38.1,
+          0.0,
+          0.0
+        ],
+        "x_axis_world": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "y_axis_world": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_axis_world": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "name": "Revolute 9",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3tDUwhIA066wMYkAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron link v4:3",
+      "occurrence_two": "fuckass v2:2",
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": 3.141592653589793,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          0.49999999999999983,
+          -0.5000000000000002,
+          0.7071067811865476
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 0.46500776763319795,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          36.79160863307698,
+          2.9653693429844057,
+          -0.6611883222227597
+        ],
+        "x_axis_world": [
+          1.0,
+          0.0,
+          -5.551115123125783e-17
+        ],
+        "y_axis_world": [
+          -8.326672684688674e-17,
+          -1.0000000000000002,
+          0.0
+        ],
+        "z_axis_world": [
+          -0.0,
+          5.551115123125783e-17,
+          -1.0
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          36.791608633077,
+          2.9653693429844084,
+          -0.6611883222227664
+        ],
+        "x_axis_world": [
+          -0.7071067811865476,
+          -0.5000000000000002,
+          -0.5
+        ],
+        "y_axis_world": [
+          0.0,
+          0.7071067811865475,
+          -0.7071067811865478
+        ],
+        "z_axis_world": [
+          0.7071067811865476,
+          -0.5000000000000001,
+          -0.4999999999999999
+        ]
+      }
+    },
+    {
+      "name": "Revolute 10",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3tDMwhIAihD2M4kAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron link v4:4",
+      "occurrence_two": "tripteron link v4:3",
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": 0.0,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          0.4999999999999745,
+          -0.50000000000002,
+          0.7071067811865437
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 2.3098225704386928,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          71.72154023900583,
+          -2.9700617782258583,
+          -29.5573634222341
+        ],
+        "x_axis_world": [
+          1.0,
+          5.551115123125783e-17,
+          5.551115123125783e-17
+        ],
+        "y_axis_world": [
+          -5.551115123125783e-17,
+          -1.0,
+          0.0
+        ],
+        "z_axis_world": [
+          1.1102230246251565e-16,
+          2.7755575615628914e-17,
+          -1.0000000000000002
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          71.72154023900586,
+          -2.9700617782258707,
+          -29.557363422234115
+        ],
+        "x_axis_world": [
+          1.0,
+          0.0,
+          -5.551115123125783e-17
+        ],
+        "y_axis_world": [
+          -8.326672684688674e-17,
+          -1.0000000000000002,
+          0.0
+        ],
+        "z_axis_world": [
+          -0.0,
+          5.551115123125783e-17,
+          -1.0
+        ]
+      }
+    },
+    {
+      "name": "Revolute 12",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3sjQ2AwAu21HV4kAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron ee v10:1",
+      "occurrence_two": "tripteron link v4:4",
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": -1.5707963267948966,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          0.4999999999999808,
+          -0.5000000000000188,
+          0.707106781186547
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 2.892875260437368,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          63.24487296940161,
+          28.69258250811667,
+          2.4175184195632706
+        ],
+        "x_axis_world": [
+          -0.8660254037844384,
+          -0.28867513459481325,
+          -0.4082482904638632
+        ],
+        "y_axis_world": [
+          -2.038552129250285e-30,
+          -0.8164965809277257,
+          0.5773502691896261
+        ],
+        "z_axis_world": [
+          -0.5000000000000004,
+          0.5000000000000002,
+          0.7071067811865472
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          63.24487296940163,
+          28.692582508116697,
+          2.417518419563284
+        ],
+        "x_axis_world": [
+          1.0,
+          5.551115123125783e-17,
+          5.551115123125783e-17
+        ],
+        "y_axis_world": [
+          -5.551115123125783e-17,
+          -1.0,
+          0.0
+        ],
+        "z_axis_world": [
+          1.1102230246251565e-16,
+          2.7755575615628914e-17,
+          -1.0000000000000002
+        ]
+      }
+    },
+    {
+      "name": "Slider 14",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3sjY2AQA+djNuokAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "fuckass2 v4:1",
+      "occurrence_two": null,
+      "is_flipped": true,
+      "is_suppressed": false,
+      "angle_parameter_value": 0.0,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::SliderJointMotion",
+        "joint_type": "slider",
+        "rotation_axis_world": null,
+        "slide_direction_world": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "rotation_value": null,
+        "slide_value": 88.23640425330427,
+        "rotation_limits": null,
+        "slide_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        }
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          126.33640425330427,
+          0.0,
+          38.1
+        ],
+        "x_axis_world": [
+          0.0,
+          -1.9762725956487898e-130,
+          1.0
+        ],
+        "y_axis_world": [
+          0.0,
+          -1.0,
+          0.0
+        ],
+        "z_axis_world": [
+          1.0,
+          0.0,
+          0.0
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          38.1,
+          0.0,
+          38.1
+        ],
+        "x_axis_world": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "y_axis_world": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_axis_world": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "name": "Revolute 16",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3sjMxAQA1YxH84kAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron link v4:5",
+      "occurrence_two": "tripteron link v4:9",
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": -1.5707963267948966,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          -0.7071067811865647,
+          -0.7071067811865688,
+          7.386238015242408e-15
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 5.564084149528887,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          112.5114597384152,
+          15.729944514889922,
+          81.19528366258035
+        ],
+        "x_axis_world": [
+          1.0000000000000002,
+          -5.551115123125783e-17,
+          -3.7095148207610044e-17
+        ],
+        "y_axis_world": [
+          -5.551115123125783e-17,
+          -1.0,
+          -8.490019706485547e-17
+        ],
+        "z_axis_world": [
+          -8.327162299588307e-18,
+          -1.3561395960193874e-16,
+          -1.0000000000000002
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          112.5114597384152,
+          15.729944514889953,
+          81.19528366258032
+        ],
+        "x_axis_world": [
+          1.0,
+          5.551115123125783e-17,
+          -2.579431958145642e-17
+        ],
+        "y_axis_world": [
+          -5.551115123125783e-17,
+          -1.0,
+          2.2973974464717378e-17
+        ],
+        "z_axis_world": [
+          -3.418097698612212e-17,
+          -4.127111120489212e-17,
+          -1.0
+        ]
+      }
+    },
+    {
+      "name": "Revolute 19",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3tjA0BQA0VMGRYkAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron link v4:8",
+      "occurrence_two": "tripteron link v4:6",
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": 0.0,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          -0.7071067811865659,
+          -0.7071067811865693,
+          7.265413615895223e-15
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 3.993287822733982,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          109.67271503585975,
+          18.568689217444348,
+          -40.081284452095716
+        ],
+        "x_axis_world": [
+          1.0,
+          1.1102230246251565e-16,
+          2.163815486052745e-17
+        ],
+        "y_axis_world": [
+          -5.551115123125783e-17,
+          -1.0,
+          6.695706066732815e-17
+        ],
+        "z_axis_world": [
+          3.560421939207702e-17,
+          5.789424627759718e-17,
+          -1.0000000000000002
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          109.67271503585967,
+          18.568689217444245,
+          -40.081284452095716
+        ],
+        "x_axis_world": [
+          1.0,
+          5.551115123125783e-17,
+          -9.636076787129485e-19
+        ],
+        "y_axis_world": [
+          0.0,
+          -1.0,
+          -6.580109434506224e-17
+        ],
+        "z_axis_world": [
+          2.9023673309400827e-18,
+          -1.3887231465787596e-17,
+          -1.0
+        ]
+      }
+    },
+    {
+      "name": "Slider 21",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3sTIyBgA8EkbGYkAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "fuckass mirrored v1:1",
+      "occurrence_two": null,
+      "is_flipped": true,
+      "is_suppressed": false,
+      "angle_parameter_value": 3.141592653589793,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::SliderJointMotion",
+        "joint_type": "slider",
+        "rotation_axis_world": null,
+        "slide_direction_world": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "rotation_value": null,
+        "slide_value": -7.229622487057302,
+        "rotation_limits": null,
+        "slide_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        }
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          30.870377512942703,
+          5.9164567891575885e-31,
+          38.099999999999994
+        ],
+        "x_axis_world": [
+          0.0,
+          -4.591690043316935e-49,
+          1.0
+        ],
+        "y_axis_world": [
+          0.0,
+          1.0,
+          -2.2958450216584675e-49
+        ],
+        "z_axis_world": [
+          -1.0,
+          0.0,
+          0.0
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          38.1,
+          0.0,
+          38.1
+        ],
+        "x_axis_world": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "y_axis_world": [
+          0.0,
+          1.0,
+          0.0
+        ],
+        "z_axis_world": [
+          0.0,
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "name": "Revolute 22",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3sTYyBAA60LX9okAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron link v4:2",
+      "occurrence_two": "fuckass mirrored v1:1",
+      "is_flipped": true,
+      "is_suppressed": false,
+      "angle_parameter_value": 0.0,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          -0.4999999999999997,
+          0.5000000000000002,
+          0.7071067811865476
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 0.35783344748388807,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          29.953833960604157,
+          2.965369342984408,
+          38.76118832222275
+        ],
+        "x_axis_world": [
+          1.0,
+          2.7755575615628914e-17,
+          -5.551115123125783e-17
+        ],
+        "y_axis_world": [
+          0.0,
+          -0.9999999999999998,
+          -5.551115123125783e-17
+        ],
+        "z_axis_world": [
+          1.1102230246251565e-16,
+          -5.551115123125783e-17,
+          -1.0
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          29.953833960604175,
+          2.965369342984408,
+          38.761188322222765
+        ],
+        "x_axis_world": [
+          -0.7071067811865476,
+          0.5000000000000002,
+          0.5
+        ],
+        "y_axis_world": [
+          0.0,
+          -0.7071067811865475,
+          0.7071067811865478
+        ],
+        "z_axis_world": [
+          0.7071067811865476,
+          0.5000000000000001,
+          0.4999999999999999
+        ]
+      }
+    },
+    {
+      "name": "Revolute 24",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3sTMwAwAIXdOXIkAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron ee v10:1",
+      "occurrence_two": "tripteron link v4:1",
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": 1.5707963267948966,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          0.5000000000000084,
+          -0.5000000000000009,
+          -0.7071067811865543
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 3.1596270266406394,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          63.24487296940181,
+          28.69258250811685,
+          40.5175184195633
+        ],
+        "x_axis_world": [
+          -0.8660254037844386,
+          -0.28867513459481275,
+          0.4082482904638631
+        ],
+        "y_axis_world": [
+          2.775557561563005e-17,
+          0.8164965809277264,
+          0.5773502691896256
+        ],
+        "z_axis_world": [
+          -0.5,
+          0.49999999999999983,
+          -0.7071067811865477
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          63.24487296940184,
+          28.692582508116857,
+          40.517518419563295
+        ],
+        "x_axis_world": [
+          0.9999999999999999,
+          -5.551115123125783e-17,
+          5.551115123125783e-17
+        ],
+        "y_axis_world": [
+          0.0,
+          -0.9999999999999998,
+          0.0
+        ],
+        "z_axis_world": [
+          -0.0,
+          0.0,
+          -0.9999999999999998
+        ]
+      }
+    },
+    {
+      "name": "Revolute 29",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3tTY1BQAUHdHBokAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron link v4:5",
+      "occurrence_two": "fuckass2 v4:1",
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": 1.5707963267948966,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          -0.7071067811865474,
+          -0.7071067811865477,
+          4.329780281177465e-17
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 5.09000810061191,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          124.43140425330431,
+          3.8100000000000165,
+          38.6964807909198
+        ],
+        "x_axis_world": [
+          1.0000000000000002,
+          -5.551115123125783e-17,
+          -3.7095148207610044e-17
+        ],
+        "y_axis_world": [
+          -5.551115123125783e-17,
+          -1.0,
+          -8.490019706485547e-17
+        ],
+        "z_axis_world": [
+          -8.327162299588307e-18,
+          -1.3561395960193874e-16,
+          -1.0000000000000002
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          124.43140425330427,
+          3.809999999999999,
+          38.696480790919814
+        ],
+        "x_axis_world": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "y_axis_world": [
+          0.0,
+          -0.7071067811865474,
+          0.7071067811865477
+        ],
+        "z_axis_world": [
+          0.0,
+          -0.7071067811865477,
+          -0.7071067811865474
+        ]
+      }
+    },
+    {
+      "name": "Revolute 30",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3tTUzBQAIVjnKYkAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron link v4:9",
+      "occurrence_two": "tripteron ee v10:1",
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": 1.5707963267948966,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          -0.7071067811865538,
+          -0.7071067811865422,
+          7.389295149790163e-15
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 5.809109258262596,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          95.95671929676034,
+          28.69258250811661,
+          40.51751841956309
+        ],
+        "x_axis_world": [
+          1.0,
+          5.551115123125783e-17,
+          -2.579431958145642e-17
+        ],
+        "y_axis_world": [
+          -5.551115123125783e-17,
+          -1.0,
+          2.2973974464717378e-17
+        ],
+        "z_axis_world": [
+          -3.418097698612212e-17,
+          -4.127111120489212e-17,
+          -1.0
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          95.95671929676034,
+          28.692582508116597,
+          40.51751841956312
+        ],
+        "x_axis_world": [
+          -0.7071067811865476,
+          0.7071067811865476,
+          -1.1156177909894717e-30
+        ],
+        "y_axis_world": [
+          7.888609052210118e-31,
+          7.888609052210118e-31,
+          -1.0
+        ],
+        "z_axis_world": [
+          -0.7071067811865476,
+          -0.7071067811865476,
+          0.0
+        ]
+      }
+    },
+    {
+      "name": "Revolute 31",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3tTM0hgAgl9aRYkAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron link v4:6",
+      "occurrence_two": "fuckass2 v4:1",
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": 0.0,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          -0.7071067811865475,
+          -0.7071067811865477,
+          1.5542227196145748e-17
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 5.809109258262493,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          124.43140425330427,
+          3.809999999999997,
+          0.5964807909198263
+        ],
+        "x_axis_world": [
+          1.0,
+          5.551115123125783e-17,
+          -9.636076787129485e-19
+        ],
+        "y_axis_world": [
+          0.0,
+          -1.0,
+          -6.580109434506224e-17
+        ],
+        "z_axis_world": [
+          2.9023673309400827e-18,
+          -1.3887231465787596e-17,
+          -1.0
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          124.43140425330427,
+          3.809999999999999,
+          0.59648079091982
+        ],
+        "x_axis_world": [
+          1.0,
+          0.0,
+          0.0
+        ],
+        "y_axis_world": [
+          0.0,
+          -0.7071067811865474,
+          0.7071067811865477
+        ],
+        "z_axis_world": [
+          0.0,
+          -0.7071067811865477,
+          -0.7071067811865474
+        ]
+      }
+    },
+    {
+      "name": "Revolute 32",
+      "entity_token": "/v4BAAAARlJLZXkAH4sIAAAAAAAA/zNQsFAwAEJDBSMgBrOMLIAsQwUTkIiZwp3kR8nVjs6tG12MXtT90PsKVGGkYGymYGpmYGxhkWimm5KSZKlrYpiYqJtomWymm2RqlGRhZGmYmmRiBlYLNIMBDYDtM1AAWwey3tTcwgQAV5Hnw4kAAAA=",
+      "object_type": "adsk::fusion::Joint",
+      "occurrence_one": "tripteron link v4:8",
+      "occurrence_two": "tripteron ee v10:1",
+      "is_flipped": false,
+      "is_suppressed": false,
+      "angle_parameter_value": -1.5707963267948966,
+      "offset_parameter_value": 0.0,
+      "motion": {
+        "motion_class": "adsk::fusion::RevoluteJointMotion",
+        "joint_type": "revolute",
+        "rotation_axis_world": [
+          -0.7071067811865538,
+          -0.7071067811865422,
+          7.389295149790163e-15
+        ],
+        "slide_direction_world": null,
+        "rotation_value": 3.519211773816889,
+        "slide_value": null,
+        "rotation_limits": {
+          "is_minimum_value_enabled": false,
+          "is_maximum_value_enabled": false,
+          "minimum_value": 0.0,
+          "maximum_value": 0.0
+        },
+        "slide_limits": null
+      },
+      "geometry_or_origin_one": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          95.95671929676014,
+          28.69258250811643,
+          2.417518419563116
+        ],
+        "x_axis_world": [
+          1.0,
+          1.1102230246251565e-16,
+          2.163815486052745e-17
+        ],
+        "y_axis_world": [
+          -5.551115123125783e-17,
+          -1.0,
+          6.695706066732815e-17
+        ],
+        "z_axis_world": [
+          3.560421939207702e-17,
+          5.789424627759718e-17,
+          -1.0000000000000002
+        ]
+      },
+      "geometry_or_origin_two": {
+        "object_type": "adsk::fusion::JointGeometry",
+        "entity_token": null,
+        "assembly_context_occurrence": null,
+        "native_object_token": null,
+        "origin_world": [
+          95.95671929676014,
+          28.69258250811641,
+          2.417518419563107
+        ],
+        "x_axis_world": [
+          -0.7071067811865476,
+          0.7071067811865476,
+          -1.1156177909894717e-30
+        ],
+        "y_axis_world": [
+          7.888609052210118e-31,
+          7.888609052210118e-31,
+          -1.0
+        ],
+        "z_axis_world": [
+          -0.7071067811865476,
+          -0.7071067811865476,
+          0.0
+        ]
+      }
+    }
+  ],
+  "joint_origins": [],
+  "occurrence_count": 12,
+  "joint_count": 15,
+  "joint_origin_count": 0
+}

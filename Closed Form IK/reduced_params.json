@@ -1,0 +1,334 @@
+{
+  "source_file": "c:\\Users\\charl\\Desktop\\fusion_kinematics_rich_export.json",
+  "root_component": "Tripteron Assem v6",
+  "units_note": "Fusion geometric values are typically in cm and rad unless otherwise documented by property.",
+  "world_x": [
+    1.0,
+    0.0,
+    0.0
+  ],
+  "world_y": [
+    0.0,
+    0.0,
+    1.0
+  ],
+  "world_z": [
+    0.0,
+    -1.0,
+    0.0
+  ],
+  "ee_centroid_world": [
+    79.600796133081,
+    28.692582508117,
+    21.467518419563
+  ],
+  "ee_coupling_points": [
+    {
+      "joint_name": "Revolute 24",
+      "point_world": [
+        63.244872969402,
+        28.692582508117,
+        40.517518419563
+      ],
+      "offset_from_centroid": [
+        -16.355923163679,
+        0.0,
+        19.05
+      ]
+    },
+    {
+      "joint_name": "Revolute 12",
+      "point_world": [
+        63.244872969402,
+        28.692582508117,
+        2.417518419563
+      ],
+      "offset_from_centroid": [
+        -16.355923163679,
+        0.0,
+        -19.05
+      ]
+    },
+    {
+      "joint_name": "Revolute 30",
+      "point_world": [
+        95.95671929676,
+        28.692582508117,
+        40.517518419563
+      ],
+      "offset_from_centroid": [
+        16.355923163679,
+        -0.0,
+        19.05
+      ]
+    },
+    {
+      "joint_name": "Revolute 32",
+      "point_world": [
+        95.95671929676,
+        28.692582508116,
+        2.417518419563
+      ],
+      "offset_from_centroid": [
+        16.355923163679,
+        -0.0,
+        -19.05
+      ]
+    }
+  ],
+  "sliders": {
+    "A": {
+      "name": "Slider 21",
+      "carriage_point_world": [
+        30.870377512942703,
+        5.9164567891575885e-31,
+        38.099999999999994
+      ],
+      "rail_reference_origin_world": [
+        38.1,
+        0.0,
+        38.1
+      ],
+      "slide_direction_world": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "slide_value": -7.229622487057302
+    },
+    "B": {
+      "name": "Slider 8",
+      "carriage_point_world": [
+        37.70815218541553,
+        -9.860761315262648e-31,
+        -2.220446049250313e-16
+      ],
+      "rail_reference_origin_world": [
+        38.1,
+        0.0,
+        0.0
+      ],
+      "slide_direction_world": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "slide_value": -0.39184781458447304
+    },
+    "C": {
+      "name": "Slider 14",
+      "carriage_point_world": [
+        126.33640425330427,
+        0.0,
+        38.1
+      ],
+      "rail_reference_origin_world": [
+        38.1,
+        0.0,
+        38.1
+      ],
+      "slide_direction_world": [
+        1.0,
+        0.0,
+        0.0
+      ],
+      "slide_value": 88.23640425330427
+    }
+  },
+  "branch_A": {
+    "name": "A",
+    "slider_joint_name": "Slider 21",
+    "rail_origin_world": [
+      38.1,
+      0.0,
+      38.1
+    ],
+    "rail_direction_world": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "slider_value": -7.229622487057302,
+    "ee_joint_name": "Revolute 24",
+    "ee_point_world": [
+      63.244872969402,
+      28.692582508117,
+      40.517518419563
+    ],
+    "ee_offset_from_centroid": [
+      -16.355923163679,
+      0.0,
+      19.05
+    ],
+    "chain_joint_names": [
+      "Revolute 22",
+      "Revolute 2",
+      "Revolute 24"
+    ],
+    "chain_joint_points_world": [
+      [
+        29.953833960604,
+        2.965369342984,
+        38.761188322223
+      ],
+      [
+        62.688899519395,
+        -7.123561871375,
+        69.042326838031
+      ],
+      [
+        63.244872969402,
+        28.692582508117,
+        40.517518419563
+      ]
+    ],
+    "rigid_segment_lengths": [
+      45.72,
+      45.790501198393
+    ]
+  },
+  "branch_B": {
+    "name": "B",
+    "slider_joint_name": "Slider 8",
+    "rail_origin_world": [
+      38.1,
+      0.0,
+      0.0
+    ],
+    "rail_direction_world": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "slider_value": -0.39184781458447304,
+    "ee_joint_name": "Revolute 12",
+    "ee_point_world": [
+      63.244872969402,
+      28.692582508117,
+      2.417518419563
+    ],
+    "ee_offset_from_centroid": [
+      -16.355923163679,
+      0.0,
+      -19.05
+    ],
+    "chain_joint_names": [
+      "Revolute 9",
+      "Revolute 10",
+      "Revolute 12"
+    ],
+    "chain_joint_points_world": [
+      [
+        36.791608633077,
+        2.965369342984,
+        -0.661188322223
+      ],
+      [
+        71.721540239006,
+        -2.970061778226,
+        -29.557363422234
+      ],
+      [
+        63.244872969402,
+        28.692582508117,
+        2.417518419563
+      ]
+    ],
+    "rigid_segment_lengths": [
+      45.72,
+      45.790501198392
+    ]
+  },
+  "branch_C": {
+    "name": "C",
+    "slider_joint_name": "Slider 14",
+    "rail_origin_world": [
+      38.1,
+      0.0,
+      38.1
+    ],
+    "rail_direction_world": [
+      1.0,
+      0.0,
+      0.0
+    ],
+    "slider_value": 88.23640425330427,
+    "ee_joint_names": [
+      "Revolute 30",
+      "Revolute 32"
+    ],
+    "ee_points_world": [
+      [
+        95.95671929676,
+        28.692582508117,
+        40.517518419563
+      ],
+      [
+        95.95671929676,
+        28.692582508116,
+        2.417518419563
+      ]
+    ],
+    "ee_offsets_from_centroid": [
+      [
+        16.355923163679,
+        -0.0,
+        19.05
+      ],
+      [
+        16.355923163679,
+        -0.0,
+        -19.05
+      ]
+    ],
+    "chain_joint_names": [
+      "Revolute 29",
+      "Revolute 31",
+      "Revolute 16",
+      "Revolute 19",
+      "Revolute 30",
+      "Revolute 32"
+    ],
+    "chain_joint_points_world": [
+      [
+        124.431404253304,
+        3.81,
+        38.69648079092
+      ],
+      [
+        124.431404253304,
+        3.81,
+        0.59648079092
+      ],
+      [
+        112.511459738415,
+        15.72994451489,
+        81.19528366258
+      ],
+      [
+        109.67271503586,
+        18.568689217444,
+        -40.081284452096
+      ],
+      [
+        95.95671929676,
+        28.692582508117,
+        40.517518419563
+      ],
+      [
+        95.95671929676,
+        28.692582508116,
+        2.417518419563
+      ]
+    ],
+    "rigid_lengths": {
+      "R29_to_R16": 45.720000000004,
+      "R31_to_R19": 45.720000000001,
+      "R16_to_R30": 45.790501198393,
+      "R19_to_R32": 45.790501198393,
+      "R30_to_R32": 38.1,
+      "R29_to_R31": 38.1,
+      "R16_to_R19": 121.342996982299
+    }
+  }
+}

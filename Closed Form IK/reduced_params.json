@@ -1,5 +1,5 @@
 {
-  "source_file": "c:\\Users\\charl\\Desktop\\fusion_kinematics_rich_export.json",
+  "source_file": "fusion_kinematics_rich_export.json",
   "root_component": "Tripteron Assem v6",
   "units_note": "Fusion geometric values are typically in cm and rad unless otherwise documented by property.",
   "world_x": [

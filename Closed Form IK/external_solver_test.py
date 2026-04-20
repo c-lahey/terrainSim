@@ -542,7 +542,7 @@ def print_model_summary(model: TripteronParameters) -> None:
 
 if __name__ == "__main__":
     # Adjust path as needed.
-    input_json = Path("fusion_kinematics_rich_export.json")
+    input_json = Path("bigger_tripteron_export.json")
 
     model, report = load_tripteron_parameters(input_json)
     print(f"Extractor validation passed: {report.passed}")

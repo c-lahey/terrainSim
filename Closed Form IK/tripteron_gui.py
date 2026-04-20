@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+import sys
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -29,6 +30,7 @@ class GUIState:
 
 class TripteronAffineGUI:
     def __init__(self, input_json: str | Path):
+        self.info_artist = None
         self.input_json = Path(input_json)
         self.model = TripteronAffineModel(input_json)
         self.kin = load_moving_plane_kinematics(input_json)
@@ -91,38 +93,38 @@ class TripteronAffineGUI:
         )
 
     def _build_figure(self) -> None:
-        self.fig = plt.figure(figsize=(12, 8))
+        self.fig = plt.figure(figsize=(14, 9))
         self.fig.suptitle("Tripteron Affine IK + Actuator Force Explorer")
 
-        self.ax_pose = self.fig.add_axes([0.06, 0.40, 0.44, 0.52], projection="3d")
-        self.ax_info = self.fig.add_axes([0.54, 0.46, 0.40, 0.46])
-        self.ax_info.axis("off")
-        self.text_info = self.ax_info.text(
-            0.0,
-            1.0,
+        self.ax_pose = self.fig.add_axes([0.05, 0.38, 0.36, 0.54], projection="3d")
+
+        # Use figure-level text instead of an axes so it doesn't get clipped.
+        self.info_artist = self.fig.text(
+            0.45,
+            0.90,
             "",
             va="top",
             ha="left",
             family="monospace",
-            fontsize=9.5,
-            linespacing=1.10,
+            fontsize=10,
+            linespacing=1.15,
         )
 
         slider_specs = [
-            ("px", 0.15, self.p0[0] - 30.0, self.p0[0] + 30.0, self.p0[0]),
-            ("py", 0.11, self.p0[1] - 30.0, self.p0[1] + 30.0, self.p0[1]),
-            ("pz", 0.07, self.p0[2] - 30.0, self.p0[2] + 30.0, self.p0[2]),
-            ("Fx", 0.27, -100.0, 100.0, 0.0),
-            ("Fy", 0.23, -100.0, 100.0, 0.0),
-            ("Fz", 0.19, -100.0, 100.0, 0.0),
+            ("px", 0.14, self.p0[0] - 100.0, self.p0[0] + 100.0, self.p0[0]),
+            ("py", 0.10, self.p0[1] - 100.0, self.p0[1] + 100.0, self.p0[1]),
+            ("pz", 0.06, self.p0[2] - 100.0, self.p0[2] + 100.0, self.p0[2]),
+            ("Fx", 0.26, -1500.0, 1500.0, 0.0),
+            ("Fy", 0.22, -1500.0, 1500.0, 0.0),
+            ("Fz", 0.18, -1500.0, 1500.0, 0.0),
         ]
 
         for name, y, vmin, vmax, vinit in slider_specs:
-            ax = self.fig.add_axes([0.12, y, 0.72, 0.03])
+            ax = self.fig.add_axes([0.12, y, 0.62, 0.03])
             self.sliders[name] = Slider(ax, name, vmin, vmax, valinit=vinit)
             self.sliders[name].on_changed(self._on_slider_change)
 
-        reset_ax = self.fig.add_axes([0.86, 0.07, 0.08, 0.05])
+        reset_ax = self.fig.add_axes([0.76, 0.05, 0.08, 0.045])
         self.reset_button = Button(reset_ax, "Reset")
         self.reset_button.on_clicked(self._on_reset)
 
@@ -155,8 +157,11 @@ class TripteronAffineGUI:
         residual = self.state.reconstruction_residual
         A = self.model.jacobian()
         b = self.model.b
+        source_name = self.input_json.name
 
         sections = [
+            f"Source file: {self.input_json.name}",
+            "",
             "EE position p",
             f"  x  {p[0]:+9.3f}",
             f"  y  {p[1]:+9.3f}",
@@ -188,7 +193,7 @@ class TripteronAffineGUI:
             f"  rz {residual[2]:+9.2e}",
             f"  least-squares {self.state.used_least_squares}",
         ]
-        self.text_info.set_text("".join(sections))
+        self.info_artist.set_text("\n".join(sections))
 
     def _plot_segment(self, p0: Vec3, p1: Vec3, **kwargs) -> None:
         self.ax_pose.plot([p0[0], p1[0]], [p0[1], p1[1]], [p0[2], p1[2]], **kwargs)
@@ -317,7 +322,14 @@ class TripteronAffineGUI:
         self._build_figure()
         plt.show()
 
-
 if __name__ == "__main__":
-    gui = TripteronAffineGUI("fusion_kinematics_rich_export.json")
+    import sys
+    from pathlib import Path
+
+    json_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("fusion_kinematics_rich_export.json")
+    print("Loading JSON from:", json_path.resolve())
+
+    gui = TripteronAffineGUI(json_path)
+    print("Loaded p0:", gui.p0)
+    print("Loaded q0:", gui.q0)
     gui.show()

@@ -485,7 +485,7 @@ def main() -> None:
         print(f"\nWrote reduced parameter file to: {args.output_json}")
 
 if __name__ == "__main__":
-    input_json = Path(r"fusion_kinematics_rich_export.json")
+    input_json = Path(r"C:\Users\charl\terrainSim\Closed Form IK\bigger_tripteron_export.json")
     output_json = None  # keep this None if you do not want to write a second JSON
 
     params, report = build_reduced_parameter_set(input_json, output_json)

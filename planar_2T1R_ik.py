@@ -220,6 +220,89 @@ def forward(theta_A: float, theta_B: float, theta_C: float,
 
 
 # ---------------------------------------------------------------------------
+# Jacobian and static force analysis
+# ---------------------------------------------------------------------------
+
+def _mat33_inv(m: list) -> list:
+    """
+    Gauss-Jordan inversion of a 3×3 matrix represented as a list of 3 rows.
+    Raises IKError if the matrix is singular (mechanism at a singularity).
+    """
+    a = [r[:] for r in m]
+    b = [[float(i == j) for j in range(3)] for i in range(3)]
+    for col in range(3):
+        pivot_row = max(range(col, 3), key=lambda r: abs(a[r][col]))
+        a[col], a[pivot_row] = a[pivot_row], a[col]
+        b[col], b[pivot_row] = b[pivot_row], b[col]
+        p = a[col][col]
+        if abs(p) < 1e-12:
+            raise IKError("Jacobian singular – mechanism is at or near a singularity")
+        inv_p = 1.0 / p
+        for j in range(3):
+            a[col][j] *= inv_p
+            b[col][j] *= inv_p
+        for row in range(3):
+            if row == col:
+                continue
+            f = a[row][col]
+            for j in range(3):
+                a[row][j] -= f * a[col][j]
+                b[row][j] -= f * b[col][j]
+    return b
+
+
+def jacobian_inv_fd(x: float, y: float, phi: float,
+                    params: Params | None = None,
+                    elbow_A: int = -1, elbow_B: int = 1, elbow_C: int = 1,
+                    eps: float = 1e-5) -> list:
+    """
+    Numerical inverse Jacobian J⁻¹ [3×3] via forward differences on the IK.
+
+    J⁻¹[i][j] = ∂θᵢ / ∂(ee_j)   where ee = [x, y, φ]
+                                  and  θ  = [θ_A, θ_B, θ_C]
+
+    Returned as a list of 3 rows, each a list of 3 floats.
+    Call _mat33_inv(result) to get the forward Jacobian J.
+    """
+    p = params or Params()
+    sol0 = solve(x, y, phi, p, elbow_A, elbow_B, elbow_C)
+    t0 = (sol0.theta_A, sol0.theta_B, sol0.theta_C)
+
+    cols = []   # cols[j] = ∂θ/∂(ee_j), a 3-vector
+    for j, (dx, dy, dp) in enumerate([(eps, 0, 0), (0, eps, 0), (0, 0, eps)]):
+        sol1 = solve(x + dx, y + dy, phi + dp, p, elbow_A, elbow_B, elbow_C)
+        t1 = (sol1.theta_A, sol1.theta_B, sol1.theta_C)
+        cols.append([(t1[i] - t0[i]) / eps for i in range(3)])
+
+    # Assemble row-major: Jinv[i][j] = cols[j][i]
+    return [[cols[j][i] for j in range(3)] for i in range(3)]
+
+
+def actuator_torques(x: float, y: float, phi: float,
+                     Fx: float, Fy: float, Mz: float,
+                     params: Params | None = None,
+                     elbow_A: int = -1, elbow_B: int = 1, elbow_C: int = 1
+                     ) -> tuple[float, float, float]:
+    """
+    Required actuator torques for a generalised EE force, via Jacobian transpose.
+
+      τ = Jᵀ · [Fx, Fy, Mz]
+
+    where J = (J⁻¹)⁻¹ is the 3×3 forward Jacobian mapping actuator velocities
+    to EE velocities.
+
+    Units: if lengths are in cm and forces in N, torques are in N·cm.
+    Mz should be in N·cm (moment around z).
+    """
+    Jinv = jacobian_inv_fd(x, y, phi, params, elbow_A, elbow_B, elbow_C)
+    J    = _mat33_inv(Jinv)
+    F    = [Fx, Fy, Mz]
+    # τ[i] = Σⱼ J[j][i] · F[j]   (column i of J dotted with F)
+    tau  = tuple(sum(J[j][i] * F[j] for j in range(3)) for i in range(3))
+    return tau
+
+
+# ---------------------------------------------------------------------------
 # Self-test
 # ---------------------------------------------------------------------------
 
@@ -277,4 +360,24 @@ if __name__ == "__main__":
 
     print()
     print("All round-trips passed." if all_ok else "SOME ROUND-TRIPS FAILED.")
+
+    # Force analysis spot check
+    print("\n--- Force analysis (default elbow config) ---")
+    print(f"{'EE pose':<30}  {'Applied force':<22}  {'τ_A':>9} {'τ_B':>9} {'τ_C':>9}")
+    print("-" * 90)
+    force_cases = [
+        (10.0, 12.0, 0.0,    1.0, 0.0, 0.0),   # 1 N in X
+        (10.0, 12.0, 0.0,    0.0, 1.0, 0.0),   # 1 N in Y
+        (10.0, 12.0, 0.0,    0.0, 0.0, 1.0),   # 1 N·cm torque
+        (10.0, 12.0, 0.15,   0.0, 1.0, 0.0),   # 1 N in Y, rotated platform
+    ]
+    for x, y, phi, Fx, Fy, Mz in force_cases:
+        try:
+            tA, tB, tC = actuator_torques(x, y, phi, Fx, Fy, Mz, p)
+            label  = f"({x},{y},{math.degrees(phi):.1f}°)"
+            forces = f"Fx={Fx} Fy={Fy} Mz={Mz}"
+            print(f"{label:<30}  {forces:<22}  {tA:>9.4f} {tB:>9.4f} {tC:>9.4f}")
+        except IKError as e:
+            print(f"  Error: {e}")
+
     sys.exit(0 if all_ok else 1)

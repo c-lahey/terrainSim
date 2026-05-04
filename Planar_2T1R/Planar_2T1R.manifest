@@ -1,0 +1,13 @@
+{
+  "autodeskProduct": "Fusion360",
+  "type": "addin",
+  "id": "Planar2T1RIK",
+  "author": "",
+  "description": {
+    "": "Planar 2T1R parallel robot – live IK drag + actuator force analyser"
+  },
+  "version": "1.0.0",
+  "runOnStartup": false,
+  "supportedOS": "windows|mac",
+  "editEnabled": false
+}

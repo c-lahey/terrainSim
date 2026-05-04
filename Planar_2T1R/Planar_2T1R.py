@@ -1,31 +1,29 @@
 """
-Fusion 360 script – Planar 2T1R IK solver
-==========================================
-Solves IK for a planar 2T1R 3-DOF parallel mechanism (Fig. 3b topology) and
-drives the three ground-revolute angle dimensions in the active sketch directly.
+Planar 2T1R Parallel Mechanism – Live IK + Actuator Force Analyser
+===================================================================
+Fusion 360 add-in.  Adds a toolbar button that activates a live command:
 
-How to use
-----------
-1.  Open your sketch in Fusion 360 (it must be the active edit target).
-2.  Name the three ground-revolute angle dimensions in your sketch:
-        theta_A  – angle of limb A's proximal link from the +x axis
-        theta_B  – angle of limb B's proximal link from the +x axis
-        theta_C  – angle of limb C's proximal link from the +x axis
-    To name a dimension: right-click it → Edit → click the name field at top.
-    These become model parameters accessible via design.allParameters.
-3.  Run this script from the Fusion 360 Scripts & Add-Ins panel.
-4.  Enter the target EE pose in the dialog: x, y (cm) and phi (degrees).
-5.  The sketch updates live.
+  • Drag the on-screen Triad handle to move the EE position (X/Y arrows).
+  • Drag the blue arc on the Triad to rotate the platform angle φ (Z rotation).
+  • Enter Fx, Fy (N) and Mz (N·cm) to apply a generalised force at the EE.
+  • The dialog shows θ_A/B/C and actuator torques τ_A/B/C continuously.
+  • The sketch updates in real-time as you drag.
 
-Elbow configuration
--------------------
-The constants ELBOW_A, ELBOW_B, ELBOW_C select which of the two geometric
-branches each limb uses (+1 or -1). The defaults match the "elbows-out"
-reference pose visible in the sketch. If the sketch snaps to a folded or
-flipped configuration, flip one of these constants and re-run.
+One-time setup
+--------------
+1.  Name the three ground-revolute angle dimensions in your sketch:
+        theta_A  – angle of limb A proximal link from +x axis
+        theta_B  – angle of limb B proximal link from +x axis
+        theta_C  – angle of limb C proximal link from +x axis
+    Right-click each dimension → Change Parameter Name.
+2.  Copy the Planar_2T1R/ folder into Fusion's AddIns directory.
+3.  Load it once from Scripts & Add-Ins → Add-Ins tab → Run.
+    A "2T1R Live IK" button appears in the Solid > Scripts panel.
+4.  Click the button any time to activate the live mode.
+    Click OK or press Enter to commit; the sketch retains the final pose.
 
-Geometry (must match your sketch)
-----------------------------------
+Geometry constants  (edit the block below to match your sketch)
+---------------------------------------------------------------
 All lengths in the same unit as your Fusion sketch (cm here).
 """
 
@@ -34,36 +32,31 @@ import adsk.fusion
 import math
 import traceback
 
+# ── Mechanism geometry ───────────────────────────────────────────────────────
 
-# ---------------------------------------------------------------------------
-# Mechanism geometry – edit these to match your sketch
-# ---------------------------------------------------------------------------
+A1  = (0.0,  0.0);  LA1, LA2 = 10.0, 14.0   # limb A: base, proximal, distal
+B1  = (8.0,  0.0);  LB1, LB2 = 10.0, 14.0   # limb B
+C1  = (20.0, 0.0);  LC1, LC2 = 10.0, 12.0   # limb C
+L_PLATFORM = 15.25                             # platform bar length (P_AB → P_C)
 
-A1  = (0.0,  0.0)   # ground revolute A position
-B1  = (8.0,  0.0)   # ground revolute B position
-C1  = (20.0, 0.0)   # ground revolute C position
+# Elbow configuration: +1 or -1 per limb.
+# (-1, +1, +1)  →  A elbow left, B and C elbows right ("elbows-out" default).
+# If the sketch snaps to a folded / wrong branch, flip one constant and reload.
+ELBOW_A, ELBOW_B, ELBOW_C = -1, 1, 1
 
-LA1, LA2 = 10.0, 14.0   # limb A link lengths (proximal, distal)
-LB1, LB2 = 10.0, 14.0   # limb B link lengths
-LC1, LC2 = 10.0, 12.0   # limb C link lengths
+# Sketch parameter names (must match the names you gave the angle dimensions)
+PARAM_A = "theta_A"
+PARAM_B = "theta_B"
+PARAM_C = "theta_C"
 
-L_PLATFORM = 15.25       # platform bar length (P_AB to P_C)
+# Initial EE pose when the command opens (cm, cm, rad)
+INIT_X, INIT_Y, INIT_PHI = 10.0, 12.0, 0.0
 
-# Elbow configuration: +1 or -1 for each limb.
-# Default: A elbow left, B and C elbows right (open / elbows-out).
-ELBOW_A = -1
-ELBOW_B =  1
-ELBOW_C =  1
-
-# Names of the sketch angle dimensions to drive
-PARAM_THETA_A = "theta_A"
-PARAM_THETA_B = "theta_B"
-PARAM_THETA_C = "theta_C"
+# Finite-difference step for Jacobian (rad / cm)
+FD_EPS = 1e-5
 
 
-# ---------------------------------------------------------------------------
-# IK core (self-contained, no external imports)
-# ---------------------------------------------------------------------------
+# ── IK core (pure Python, embedded for self-containment) ─────────────────────
 
 class IKError(Exception):
     pass
@@ -71,17 +64,17 @@ class IKError(Exception):
 
 def _two_R(base, l1, l2, target, elbow):
     """
-    2R planar IK – returns ground-joint angle (rad).
+    Ground-joint angle for a single 2R planar limb (law of cosines).
 
-      theta = atan2(dy,dx)  -  elbow * acos((l1^2 + d^2 - l2^2) / (2 l1 d))
+      theta = atan2(dy, dx)  -  elbow * acos((l1^2 + d^2 - l2^2) / (2 l1 d))
     """
     dx, dy = target[0] - base[0], target[1] - base[1]
     d = math.hypot(dx, dy)
     lo, hi = abs(l1 - l2), l1 + l2
     if d > hi + 1e-6:
-        raise IKError(f"Target too far: dist {d:.4f} > {hi:.4f}")
+        raise IKError(f"Unreachable: dist {d:.3f} > max reach {hi:.3f}")
     if d < lo - 1e-6:
-        raise IKError(f"Target too close: dist {d:.4f} < {lo:.4f}")
+        raise IKError(f"Unreachable: dist {d:.3f} < min reach {lo:.3f}")
     d = min(hi, max(lo, d))
     alpha = math.atan2(dy, dx)
     cos_g = (l1*l1 + d*d - l2*l2) / (2.0 * l1 * d)
@@ -89,120 +82,255 @@ def _two_R(base, l1, l2, target, elbow):
     return alpha - elbow * gamma
 
 
-def _solve_ik(x, y, phi):
-    """
-    Closed-form IK.  Returns (theta_A, theta_B, theta_C) in radians.
-    Raises IKError if any limb cannot reach its target.
-
-    Platform attachments:
-      P_AB = EE - (L/2)[cos phi, sin phi]   <- shared by limbs A and B
-      P_C  = EE + (L/2)[cos phi, sin phi]   <- limb C only
-    """
+def _ik(x, y, phi):
+    """Full 3-limb IK. Returns (theta_A, theta_B, theta_C) in radians."""
     h = 0.5 * L_PLATFORM
     c, s = math.cos(phi), math.sin(phi)
-    P_AB = (x - h*c, y - h*s)
-    P_C  = (x + h*c, y + h*s)
+    PAB = (x - h*c, y - h*s)   # shared attachment (limbs A and B)
+    PC  = (x + h*c, y + h*s)   # limb C attachment
+    return (
+        _two_R(A1, LA1, LA2, PAB, ELBOW_A),
+        _two_R(B1, LB1, LB2, PAB, ELBOW_B),
+        _two_R(C1, LC1, LC2, PC,  ELBOW_C),
+    )
 
-    theta_A = _two_R(A1, LA1, LA2, P_AB, ELBOW_A)
-    theta_B = _two_R(B1, LB1, LB2, P_AB, ELBOW_B)
-    theta_C = _two_R(C1, LC1, LC2, P_C,  ELBOW_C)
-    return theta_A, theta_B, theta_C
+
+# ── 3×3 linear algebra ────────────────────────────────────────────────────────
+
+def _inv33(m):
+    """
+    Gauss-Jordan 3×3 matrix inversion.
+    m  : list of 3 rows, each a list of 3 floats.
+    Raises IKError if the matrix is singular.
+    """
+    a = [r[:] for r in m]
+    b = [[float(i == j) for j in range(3)] for i in range(3)]
+    for col in range(3):
+        pr = max(range(col, 3), key=lambda r: abs(a[r][col]))
+        a[col], a[pr] = a[pr], a[col]
+        b[col], b[pr] = b[pr], b[col]
+        p = a[col][col]
+        if abs(p) < 1e-12:
+            raise IKError("Jacobian singular – mechanism is near a singularity")
+        ip = 1.0 / p
+        for j in range(3):
+            a[col][j] *= ip
+            b[col][j] *= ip
+        for row in range(3):
+            if row == col:
+                continue
+            f = a[row][col]
+            for j in range(3):
+                a[row][j] -= f * a[col][j]
+                b[row][j] -= f * b[col][j]
+    return b
 
 
-# ---------------------------------------------------------------------------
-# Fusion entry point
-# ---------------------------------------------------------------------------
+def _actuator_torques(x, y, phi, Fx, Fy, Mz):
+    """
+    τ = Jᵀ · [Fx, Fy, Mz]
+
+    Algorithm
+    ---------
+    1. Compute J⁻¹ numerically via forward differences on the IK.
+       J⁻¹[i][j] = ∂θᵢ/∂(ee_j)  where ee = [x, y, φ].
+    2. Invert to get J (forward Jacobian).
+    3. τ[i] = Σⱼ J[j][i] · F[j]   (column i of J dotted with F).
+
+    Units: lengths in cm, forces in N  →  torques in N·cm.
+    """
+    t0 = _ik(x, y, phi)
+    cols = []
+    for dx, dy, dp in [(FD_EPS, 0, 0), (0, FD_EPS, 0), (0, 0, FD_EPS)]:
+        t1 = _ik(x + dx, y + dy, phi + dp)
+        cols.append([(t1[i] - t0[i]) / FD_EPS for i in range(3)])
+
+    # Jinv[i][j] = ∂θᵢ/∂(ee_j) = cols[j][i]
+    Jinv = [[cols[j][i] for j in range(3)] for i in range(3)]
+    J    = _inv33(Jinv)
+
+    F   = [Fx, Fy, Mz]
+    tau = [sum(J[j][i] * F[j] for j in range(3)) for i in range(3)]
+    return tau
+
+
+# ── Fusion add-in state (prevent GC of event handlers) ───────────────────────
+
+_handlers = []
+_cmd_def  = None
+_btn_ctrl = None
+
+
+# ── Add-in lifecycle ──────────────────────────────────────────────────────────
 
 def run(context):
+    global _cmd_def, _btn_ctrl
     app = adsk.core.Application.get()
     ui  = app.userInterface
-
     try:
-        # --- collect target pose from user -----------------------------------
-        result, cancelled = ui.inputBox(
-            "Enter target EE pose:   x,  y,  phi\n"
-            "\n"
-            "  x, y  = EE position (cm)\n"
-            "  phi   = platform angle from horizontal (degrees)\n"
-            "          positive = CCW\n"
-            "\n"
-            "Example:  10, 12, 0",
-            "2T1R IK Solver",
-            "10, 12, 0"
+        _cleanup(ui)
+
+        _cmd_def = ui.commandDefinitions.addButtonDefinition(
+            "Planar2T1RIK_Cmd",
+            "2T1R Live IK",
+            "Drag the Triad to pose the mechanism.\n"
+            "Enter Fx, Fy, Mz to see required actuator torques.\n"
+            "Sketch angle dimensions theta_A / theta_B / theta_C update live."
         )
-        if cancelled:
-            return
+        h = _CreatedHandler()
+        _cmd_def.commandCreated.add(h)
+        _handlers.append(h)
 
-        try:
-            parts = [s.strip() for s in result.split(",")]
-            if len(parts) != 3:
-                raise ValueError("Need exactly three comma-separated values.")
-            x, y, phi_deg = float(parts[0]), float(parts[1]), float(parts[2])
-        except ValueError as e:
-            ui.messageBox(f"Bad input: {e}\n\nExpected format:  x, y, phi_deg")
-            return
-
-        phi = math.radians(phi_deg)
-
-        # --- solve IK --------------------------------------------------------
-        try:
-            theta_A, theta_B, theta_C = _solve_ik(x, y, phi)
-        except IKError as e:
-            ui.messageBox(f"IK Error – pose unreachable:\n{e}")
-            return
-
-        deg_A = math.degrees(theta_A)
-        deg_B = math.degrees(theta_B)
-        deg_C = math.degrees(theta_C)
-
-        # --- drive sketch parameters -----------------------------------------
-        design = adsk.fusion.Design.cast(app.activeProduct)
-        if design is None:
-            ui.messageBox("No active Fusion design found.")
-            return
-
-        all_params = design.allParameters
-        param_map = {
-            PARAM_THETA_A: (theta_A, deg_A),
-            PARAM_THETA_B: (theta_B, deg_B),
-            PARAM_THETA_C: (theta_C, deg_C),
-        }
-
-        missing = []
-        set_ok  = []
-        for name, (rad, deg) in param_map.items():
-            param = all_params.itemByName(name)
-            if param is None:
-                missing.append(name)
-            else:
-                # Fusion sketch angle dimensions use degrees as internal unit.
-                # Negative angles are valid and flip direction.
-                param.expression = f"{deg:.8f} deg"
-                set_ok.append(f"  {name} = {deg:.3f}°")
-
-        # --- report result ---------------------------------------------------
-        lines = [
-            f"IK solved for EE = ({x}, {y}) cm,  φ = {phi_deg}°",
-            "",
-            f"  θ_A = {deg_A:.4f}°",
-            f"  θ_B = {deg_B:.4f}°",
-            f"  θ_C = {deg_C:.4f}°",
-        ]
-
-        if set_ok:
-            lines += ["", "Sketch parameters updated:"] + set_ok
-
-        if missing:
-            lines += [
-                "",
-                "⚠️  The following parameters were not found in the design:",
-            ] + [f"  • {n}" for n in missing] + [
-                "",
-                "Name your sketch angle dimensions as shown above,",
-                "then re-run the script.",
-            ]
-
-        ui.messageBox("\n".join(lines), "2T1R IK Result")
+        panel = ui.allToolbarPanels.itemById("SolidScriptsAddinsPanel")
+        _btn_ctrl = panel.controls.addCommand(_cmd_def)
+        _btn_ctrl.isPromotedByDefault = True
 
     except Exception:
-        ui.messageBox(f"Unexpected error:\n{traceback.format_exc()}")
+        ui.messageBox(traceback.format_exc())
+
+
+def stop(context):
+    global _handlers, _cmd_def, _btn_ctrl
+    _cleanup(adsk.core.Application.get().userInterface)
+    _handlers.clear()
+    _cmd_def  = None
+    _btn_ctrl = None
+
+
+def _cleanup(ui):
+    old = ui.commandDefinitions.itemById("Planar2T1RIK_Cmd")
+    if old:
+        old.deleteMe()
+    panel = ui.allToolbarPanels.itemById("SolidScriptsAddinsPanel")
+    if panel:
+        ctrl = panel.controls.itemById("Planar2T1RIK_Cmd")
+        if ctrl:
+            ctrl.deleteMe()
+
+
+# ── Event handlers ────────────────────────────────────────────────────────────
+
+class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
+    def notify(self, args):
+        try:
+            cmd    = args.command
+            cmd.isRepeatable = False
+            inputs = cmd.commandInputs
+
+            # ── Triad at initial EE position ──────────────────────────────────
+            # Translation handles (red/green arrows) control x, y.
+            # Blue arc (Z rotation) controls platform angle φ.
+            mat = adsk.core.Matrix3D.create()
+            mat.translation = adsk.core.Vector3D.create(INIT_X, INIT_Y, 0.0)
+            inputs.addTriadCommandInput("triad", mat)
+
+            # ── Applied generalised force inputs ──────────────────────────────
+            vr = adsk.core.ValueInput.createByReal
+            inputs.addValueInput("Fx", "Applied Fx  (N)",    "", vr(0.0))
+            inputs.addValueInput("Fy", "Applied Fy  (N)",    "", vr(0.0))
+            inputs.addValueInput("Mz", "Applied Mz  (N·cm)", "", vr(0.0))
+
+            # ── Read-only results panel ───────────────────────────────────────
+            inputs.addTextBoxCommandInput(
+                "out", "Kinematics / Forces",
+                "Drag the Triad to begin.", 7, True
+            )
+
+            # ── Wire up preview and change handlers ───────────────────────────
+            for cls, evt in (
+                (_PreviewHandler,      cmd.executePreview),
+                (_InputChangedHandler, cmd.inputChanged),
+                (_DestroyHandler,      cmd.destroy),
+            ):
+                h = cls()
+                evt.add(h)
+                _handlers.append(h)
+
+        except Exception:
+            adsk.core.Application.get().userInterface.messageBox(
+                traceback.format_exc()
+            )
+
+
+def _read_triad(inputs):
+    """
+    Extract (x, y, phi) from the Triad transform.
+
+    x, y come from the translation component directly.
+    phi is recovered by transforming the unit-X vector: because Vector3D.transformBy()
+    applies only the rotational part of the matrix (directions are translation-free),
+    atan2(xv.y, xv.x) gives the angle of the platform bar from the +x axis.
+    """
+    xf = inputs.itemById("triad").transform
+    t  = xf.translation
+    x, y = t.x, t.y
+
+    xv = adsk.core.Vector3D.create(1.0, 0.0, 0.0)
+    xv.transformBy(xf)
+    phi = math.atan2(xv.y, xv.x)
+    return x, y, phi
+
+
+def _do_update(inputs):
+    """Core update: read Triad → IK → sketch params → torques → display."""
+    out = inputs.itemById("out")
+    try:
+        x, y, phi = _read_triad(inputs)
+        Fx = inputs.itemById("Fx").value
+        Fy = inputs.itemById("Fy").value
+        Mz = inputs.itemById("Mz").value
+
+        # ── IK ───────────────────────────────────────────────────────────────
+        tA, tB, tC = _ik(x, y, phi)
+
+        # ── Drive sketch angle parameters ─────────────────────────────────────
+        design = adsk.fusion.Design.cast(
+            adsk.core.Application.get().activeProduct
+        )
+        missing = []
+        if design:
+            ap = design.allParameters
+            for name, angle in ((PARAM_A, tA), (PARAM_B, tB), (PARAM_C, tC)):
+                p = ap.itemByName(name)
+                if p:
+                    p.expression = f"{math.degrees(angle):.8f} deg"
+                else:
+                    missing.append(name)
+
+        # ── Actuator torques ──────────────────────────────────────────────────
+        tau = _actuator_torques(x, y, phi, Fx, Fy, Mz)
+
+        # ── Results display ───────────────────────────────────────────────────
+        warn = (f"\n⚠  Parameters not found: {', '.join(missing)}"
+                if missing else "")
+        out.text = (
+            f"EE  =  ({x:.3f},  {y:.3f}) cm     φ = {math.degrees(phi):.2f}°\n"
+            f"\n"
+            f"θ_A = {math.degrees(tA):>8.3f}°     τ_A = {tau[0]:>9.4f} N·cm\n"
+            f"θ_B = {math.degrees(tB):>8.3f}°     τ_B = {tau[1]:>9.4f} N·cm\n"
+            f"θ_C = {math.degrees(tC):>8.3f}°     τ_C = {tau[2]:>9.4f} N·cm"
+            + warn
+        )
+
+    except IKError as e:
+        if out:
+            out.text = f"IK Error – pose unreachable:\n{e}"
+    except Exception:
+        if out:
+            out.text = traceback.format_exc()[:400]
+
+
+class _PreviewHandler(adsk.core.CommandEventHandler):
+    def notify(self, args):
+        _do_update(args.command.commandInputs)
+        args.isValidResult = True
+
+
+class _InputChangedHandler(adsk.core.InputChangedEventHandler):
+    def notify(self, args):
+        _do_update(args.inputs)
+
+
+class _DestroyHandler(adsk.core.CommandEventHandler):
+    def notify(self, args):
+        pass  # add-in stays loaded; button remains until stop() is called

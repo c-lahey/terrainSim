@@ -218,10 +218,14 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
             inputs = cmd.commandInputs
 
             # ── Triad at initial EE position ──────────────────────────────────
-            # Translation handles (red/green arrows) control x, y.
-            # Blue arc (Z rotation) controls platform angle φ.
+            # INIT_X / INIT_Y are in sketch display units (e.g. inches).
+            # Matrix3D.translation must be in cm (Fusion API internal unit),
+            # so we divide by the cm→display-unit scale factor.
+            scale, _ = _sketch_unit()
             mat = adsk.core.Matrix3D.create()
-            mat.translation = adsk.core.Vector3D.create(INIT_X, INIT_Y, 0.0)
+            mat.translation = adsk.core.Vector3D.create(
+                INIT_X / scale, INIT_Y / scale, 0.0
+            )
             inputs.addTriadCommandInput("triad", mat)
 
             # ── Applied generalised force inputs ──────────────────────────────
@@ -252,18 +256,40 @@ class _CreatedHandler(adsk.core.CommandCreatedEventHandler):
             )
 
 
+def _sketch_unit():
+    """
+    Return (scale, label) where scale converts Fusion API values (always cm)
+    to the document's current display length unit.
+
+    Example: document in inches → scale ≈ 0.3937, label = "in"
+    """
+    try:
+        design = adsk.fusion.Design.cast(
+            adsk.core.Application.get().activeProduct
+        )
+        um    = design.unitsManager
+        label = um.defaultLengthUnits          # e.g. "in", "cm", "mm"
+        scale = um.convert(1.0, "cm", label)   # e.g. 0.3937 for inches
+        return scale, label
+    except Exception:
+        return 1.0, "cm"
+
+
 def _read_triad(inputs):
     """
     Extract (x, y, phi) from the Triad transform.
 
-    x, y come from the translation component directly.
-    phi is recovered by transforming the unit-X vector: because Vector3D.transformBy()
-    applies only the rotational part of the matrix (directions are translation-free),
-    atan2(xv.y, xv.x) gives the angle of the platform bar from the +x axis.
+    Fusion's Matrix3D always uses cm internally.  We convert x, y to the
+    document's display unit so they match the geometry constants (INIT_X,
+    link lengths, base positions) which the user specifies in sketch units.
+
+    phi is recovered by transforming the unit-X vector through the rotation
+    only (Vector3D.transformBy ignores translation), then taking atan2.
     """
-    xf = inputs.itemById("triad").transform
-    t  = xf.translation
-    x, y = t.x, t.y
+    xf         = inputs.itemById("triad").transform
+    t          = xf.translation
+    scale, _   = _sketch_unit()
+    x, y       = t.x * scale, t.y * scale
 
     xv = adsk.core.Vector3D.create(1.0, 0.0, 0.0)
     xv.transformBy(xf)
@@ -303,12 +329,13 @@ def _do_update(inputs):
         # ── Results display ───────────────────────────────────────────────────
         warn = (f"\n⚠  Parameters not found: {', '.join(missing)}"
                 if missing else "")
+        _, ulabel = _sketch_unit()
         out.text = (
-            f"EE  =  ({x:.3f},  {y:.3f}) cm     φ = {math.degrees(phi):.2f}°\n"
+            f"EE  =  ({x:.3f},  {y:.3f}) {ulabel}     φ = {math.degrees(phi):.2f}°\n"
             f"\n"
-            f"θ_A = {math.degrees(tA):>8.3f}°     τ_A = {tau[0]:>9.4f} N·cm\n"
-            f"θ_B = {math.degrees(tB):>8.3f}°     τ_B = {tau[1]:>9.4f} N·cm\n"
-            f"θ_C = {math.degrees(tC):>8.3f}°     τ_C = {tau[2]:>9.4f} N·cm"
+            f"θ_A = {math.degrees(tA):>8.3f}°     τ_A = {tau[0]:>9.4f} N·{ulabel}\n"
+            f"θ_B = {math.degrees(tB):>8.3f}°     τ_B = {tau[1]:>9.4f} N·{ulabel}\n"
+            f"θ_C = {math.degrees(tC):>8.3f}°     τ_C = {tau[2]:>9.4f} N·{ulabel}"
             + warn
         )
 
